@@ -1,4 +1,4 @@
-###Navodila:
+Navodila:
                             Igra Izbrisi plastiko
 Igro Izbrisi plastiko OBVEZNO "spisete" v programskem jeziku C++  da ne bi bilo pomote
 ROK ODDAJE: 17. 02. 2019
