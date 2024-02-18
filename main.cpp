@@ -35,7 +35,7 @@ int main() {
 	
 	Player player;
 	player.setPath("Assets/Boat.png");
-	player.setRect({Random::randint((int)(WindowData::SCREEN_WIDTH * 11 / 30), (int)(WindowData::SCREEN_WIDTH * 0.9)), Random::randint(500, 800), 160, 115});
+	player.setRect({Random::randint((int)(WindowData::SCREEN_WIDTH * 21 / 30), (int)(WindowData::SCREEN_WIDTH * 0.9)), Random::randint(500, 800), 160, 115});
 	
 	std::vector<Wave> waves;
 	for (int i = 0; i < 20; i++){
@@ -44,8 +44,8 @@ int main() {
 	}
 	
 	std::vector<Trash> trash;
-	for (int i = 20; i--;) {
-		trash.push_back(Trash(Random::randint(WindowData::SCREEN_WIDTH/3, WindowData::SCREEN_WIDTH - 50), Random::randint( WindowData::SCREEN_HEIGHT - 50)));
+	for (int i = 10; i--;) {
+		trash.push_back(Trash(Random::randint(WindowData::SCREEN_WIDTH/3, (WindowData::SCREEN_WIDTH * 2) / 3 - 50), Random::randint( WindowData::SCREEN_HEIGHT - 50)));
 	}
 	
 	Text score;
@@ -72,8 +72,12 @@ int main() {
 		for (uint64_t i = trash.size(); i--;) {
 			trash[i].Update();
 			if (isColliding(player, trash[i])) {
-				trash.erase(trash.begin() + (int64_t)i);
+				trash.erase(trash.begin() + (int64_t)i); // Yes that is how I cast to unsigned long I may or may not be chronically deranged
 				++Data::score;
+			}
+			if (trash[i].getRect().x > WindowData::SCREEN_WIDTH + 50){
+				trash.erase(trash.begin() + (int64_t)i); // Yes that is how I cast to unsigned long I may or may not be chronically deranged
+				--Data::score;
 			}
 			window.Draw(trash[i]);
 		}

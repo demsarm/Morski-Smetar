@@ -17,10 +17,9 @@ class Trash : public GameObject {
 	};
 	
 	uint8_t type;
-	double offset;
-	int initialY;
 	
-	bool direction;
+	int initial_y;
+	int offset;
 	
 public:
 	[[maybe_unused]] Trash();

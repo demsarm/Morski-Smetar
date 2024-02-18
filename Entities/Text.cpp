@@ -36,6 +36,3 @@ const std::string &Text::getText() const {
 const SDL_Color &Text::getColor() const {
 	return color;
 }
-
-
-
