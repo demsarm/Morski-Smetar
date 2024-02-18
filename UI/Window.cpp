@@ -240,6 +240,11 @@ void Window::DrawBackground(const std::string &texture_path) {
 	// TODO make this look less goofy when aspect ratios don't match
 }
 
+/**
+ * @brief Draws a Text to the screen
+ * @param text The Text to draw
+ * @note Already uses absolutePath to get the absolute path of the font
+ */
 void Window::Draw(const Text &text) {
 	SDL_Rect drawn = text.getRect();
 	TTF_Font *font = TTF_OpenFont(absolutePath(text.getFontPath()).c_str(), text.getFontSize());

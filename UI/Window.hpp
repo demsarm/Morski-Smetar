@@ -48,5 +48,4 @@ public:
 	[[nodiscard]] SDL_Window *getWindow() const;
 };
 
-
 #endif //SDL_GAME_WINDOW_HPP

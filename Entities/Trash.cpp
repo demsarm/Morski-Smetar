@@ -27,6 +27,6 @@ void Trash::Update() {
 	offset += 0.01;
 }
 
-uint8_t Trash::getType() const {
+[[maybe_unused]] uint8_t Trash::getType() const {
 	return type;
 }

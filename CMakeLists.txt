@@ -29,6 +29,8 @@ add_executable(Morski_Smetar main.cpp
         Config/Data.hpp
         Entities/Text.cpp
         Entities/Text.hpp
+        Tools/Overloads.cpp
+        Tools/Overloads.hpp
 )
 
 target_link_libraries(Morski_Smetar SDL2::SDL2)
