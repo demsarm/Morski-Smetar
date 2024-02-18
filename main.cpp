@@ -10,8 +10,12 @@
 #include "Entities/Player.hpp"
 #include "Entities/Wave.hpp"
 #include "Entities/Trash.hpp"
+#include "Entities/Text.hpp"
 
 #include "Config/Config.hpp"
+#include "Config/Data.hpp"
+
+using namespace std;
 
 int main() {
 	Window::init();
@@ -40,6 +44,13 @@ int main() {
 		trash.push_back(Trash(Random::randint(500, 800), Random::randint( WindowData::SCREEN_HEIGHT)));
 	}
 	
+	Text score;
+	score.setText(string("Score-O-Meter"));
+	score.setFontPath(string("Assets/Fonts/VCR_OSD_MONO.ttf"));
+	score.setFontSize(30);
+	score.setColor((SDL_Color){255, 255, 255, 255});
+	score.setRect({10, 10, 200, 50});
+	
 	while (window.isRunning()){
 		window.Clear((SDL_Color){50, 210, 255, 255});
 		
@@ -52,6 +63,7 @@ int main() {
 			trash[i].Update();
 			if (isColliding(player, trash[i])) {
 				trash.erase(trash.begin() + (int64_t)i);
+				++Data::score;
 			}
 			window.Draw(trash[i]);
 			
@@ -59,6 +71,9 @@ int main() {
 		
 		player.Update();
 		window.Draw(player, 0.0, player.isFacingLeft() ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL);
+		
+		score.setText(string("Score: ") + to_string(Data::score));
+		window.Draw(score);
 		window.Flip();
 	}
 }

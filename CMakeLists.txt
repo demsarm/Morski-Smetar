@@ -25,6 +25,10 @@ add_executable(Morski_Smetar main.cpp
         Entities/Trash.hpp
         Tools/Collision.cpp
         Tools/Collision.hpp
+        Config/Data.cpp
+        Config/Data.hpp
+        Entities/Text.cpp
+        Entities/Text.hpp
 )
 
 target_link_libraries(Morski_Smetar SDL2::SDL2)

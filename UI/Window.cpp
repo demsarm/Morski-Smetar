@@ -239,3 +239,14 @@ void Window::DrawBackground(const std::string &texture_path) {
 	SDL_DestroyTexture(texture);
 	// TODO make this look less goofy when aspect ratios don't match
 }
+
+void Window::Draw(const Text &text) {
+	SDL_Rect drawn = text.getRect();
+	TTF_Font *font = TTF_OpenFont(absolutePath(text.getFontPath()).c_str(), text.getFontSize());
+	SDL_Surface *surface = TTF_RenderText_Solid(font, text.getText().c_str(), text.getColor());
+	SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+	SDL_FreeSurface(surface);
+	SDL_RenderCopy(renderer, texture, nullptr, &drawn);
+	SDL_DestroyTexture(texture);
+	TTF_CloseFont(font);
+}

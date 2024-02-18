@@ -12,7 +12,7 @@
 #include "../Entities/GameObject.hpp"
 #include "../Tools/Path.hpp"
 #include "../Config/Config.hpp"
-
+#include "../Entities/Text.hpp"
 std::pair<int, int> getScreenSize();
 
 class Window {
@@ -37,6 +37,7 @@ public:
 	void Draw(SDL_Rect rect, SDL_Color);
 	void Draw(const SDL_Rect& rect, const std::string& texture_path);
 	void Draw(const GameObject& object, double angle = 0.0, SDL_RendererFlip flip = SDL_FLIP_NONE);
+	void Draw(const Text& text);
 	void DrawBackground(const std::string& texture_path);
 	void Raise();
 	
