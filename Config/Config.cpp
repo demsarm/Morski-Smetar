@@ -9,3 +9,7 @@ namespace WindowData {
 	int SCREEN_HEIGHT = 600;
 	int SCREEN_FPS = 60;
 }
+
+namespace Config{
+	int ENEMY_ATTACK_CD = 60;
+}

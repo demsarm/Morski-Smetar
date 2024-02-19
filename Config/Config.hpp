@@ -11,4 +11,8 @@ namespace WindowData {
 	extern int SCREEN_FPS;
 }
 
+namespace Config{
+	extern int ENEMY_ATTACK_CD;
+}
+
 #endif //MORSKI_SMETAR_CONFIG_HPP
