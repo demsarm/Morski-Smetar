@@ -150,11 +150,14 @@ int main() {
 			
 			score.setText(string("Score: ") + to_string(Data::score));
 			window.Draw(score);
-			if (isColliding(player.getRect(), (SDL_Rect) {WindowData::SCREEN_WIDTH / 3, 0, WindowData::SCREEN_WIDTH / 6,
+			if (isColliding(player.getRect(), (SDL_Rect) {
+														  WindowData::SCREEN_WIDTH / 3, 0,
+														  WindowData::SCREEN_WIDTH / 6,
 			                                              WindowData::SCREEN_HEIGHT})) {
 				std::string str = "Press E to disembark";
 				Text embark(str, string("Assets/Fonts/VCR_OSD_MONO.ttf"), 30, (SDL_Color) {255, 255, 255, 255});
-				embark.setRect({WindowData::SCREEN_WIDTH / 2 - 400, WindowData::SCREEN_HEIGHT - 100,
+				embark.setRect({WindowData::SCREEN_WIDTH / 2 - 400,
+								WindowData::SCREEN_HEIGHT - 100,
 				                LETTER_WIDTH * (int) str.size(), 50});
 				window.Draw(embark);
 				
