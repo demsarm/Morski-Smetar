@@ -53,7 +53,7 @@ int main() {
 	}
 	
 	std::vector<Enemy> enemies;
-	for (int i = 2 * Data::difficulty + 1; i--;) {
+	for (int i = Data::difficulty; i--;) {
 		Enemy enemy;
 		enemy.setPath("Assets/Enemy.png");
 		enemy.setRect({Random::randint(WindowData::SCREEN_WIDTH / 12, WindowData::SCREEN_WIDTH / 4),
@@ -164,7 +164,7 @@ int main() {
 		
 		if (enemies.empty() && trash.empty()) {
 			++Data::difficulty;
-			for (int i = 2 * Data::difficulty + 1; i--;) {
+			for (int i = Data::difficulty; i--;) {
 				Enemy enemy;
 				enemy.setPath("Assets/Enemy.png");
 				enemy.setRect({Random::randint(WindowData::SCREEN_WIDTH / 12, WindowData::SCREEN_WIDTH / 4),
@@ -176,6 +176,16 @@ int main() {
 				trash.push_back(
 						Trash(Random::randint(WindowData::SCREEN_WIDTH / 3, (WindowData::SCREEN_WIDTH * 2) / 3 - 50),
 						      Random::randint(WindowData::SCREEN_HEIGHT - 50)));
+			}
+			if (800 + 100 * Data::difficulty < getScreenSize().first) {
+				std::pair<int, int> pos = window.getWindowsPosition();
+				pos.first -= 50;
+				window.setWindowsPosition(pos.first, pos.second);
+			}
+			if (600 + 100 * Data::difficulty < getScreenSize().second) {
+				std::pair<int, int> pos = window.getWindowsPosition();
+				pos.second -= 50;
+				window.setWindowsPosition(pos.first, pos.second);
 			}
 			Window::setWindowSize(800 + 100 * Data::difficulty < getScreenSize().first ? 800 + 100 * Data::difficulty : getScreenSize().first, 600 + 100 * Data::difficulty < getScreenSize().second ? 600 + 100 * Data::difficulty : getScreenSize().second);
 			window.changeWindowSize(WindowData::SCREEN_WIDTH, WindowData::SCREEN_HEIGHT);

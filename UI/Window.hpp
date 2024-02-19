@@ -29,6 +29,9 @@ public:
 	static void setWindowSize(std::pair<int, int> size);
 	void changeWindowSize(int w, int h);
 	
+	std::pair<int, int> getWindowsPosition();
+	void setWindowsPosition(int x, int y);
+	
 	Window(const char *title, int x, int y, int w, int h, Uint32 flags);
 	~Window();
 	

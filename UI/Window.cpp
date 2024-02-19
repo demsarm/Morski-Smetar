@@ -281,4 +281,12 @@ void Window::changeWindowSize(int w, int h) {
 	SDL_SetWindowSize(window, w, h);
 }
 
+std::pair<int, int> Window::getWindowsPosition() {
+	int x, y;
+	SDL_GetWindowPosition(window, &x, &y);
+	return {x, y};
+}
 
+void Window::setWindowsPosition(int x, int y) {
+	SDL_SetWindowPosition(window, x, y);
+}
