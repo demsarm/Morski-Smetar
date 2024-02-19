@@ -12,11 +12,12 @@
  * The player moves up when the 'W' key is pressed, down when the 'S' key is pressed,
  * left when the 'A' key is pressed, and right when the 'D' key is pressed.
  */
-Player::Player() : facing_right(true) {}
+Player::Player() : facing_right(true), sonar_color(){}
 
 [[maybe_unused]] Player::Player(const SDL_Rect& rect, const Design& design) : facing_right(true) {
 	this->rect = rect;
 	this->design = design;
+	sonar_color = {255, 255, 255, 255};
 }
 
 /**
@@ -133,4 +134,8 @@ SDL_Color Player::getSonarColor() const {
  */
 void Player::setBoatPosition(const SDL_Rect &rect) {
 	boat_position = rect;
+}
+
+void Player::setState(Player::PlayerState new_state) {
+	state = new_state;
 }

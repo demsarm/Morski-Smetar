@@ -13,7 +13,7 @@
 #include "../Tools/Path.hpp"
 #include "../Config/Config.hpp"
 #include "../Entities/Text.hpp"
-std::pair<int, int> getScreenSize();
+[[maybe_unused]] std::pair<int, int> getScreenSize();
 
 class Window {
 	SDL_Window *window;
@@ -24,9 +24,9 @@ class Window {
 	
 public:
 	static void init();
-	static void setWindowSize(int percent);
+	[[maybe_unused]] static void setWindowSize(int percent);
 	static void setWindowSize(int w, int h);
-	static void setWindowSize(std::pair<int, int> size);
+	[[maybe_unused]] static void setWindowSize(std::pair<int, int> size);
 	void changeWindowSize(int w, int h);
 	
 	std::pair<int, int> getWindowsPosition();
@@ -36,22 +36,24 @@ public:
 	~Window();
 	
 	void Flip();
-	void Clear();
+	[[maybe_unused]] void Clear();
 	void Clear(SDL_Color col);
 	void Draw(SDL_Rect rect, SDL_Color);
-	void Draw(const SDL_Rect& rect, const std::string& texture_path);
+	[[maybe_unused]] void Draw(const SDL_Rect& rect, const std::string& texture_path);
 	void Draw(const GameObject& object, double angle = 0.0, SDL_RendererFlip flip = SDL_FLIP_NONE);
 	void Draw(const Text& text);
 	void DrawLine(int x1, int y1, int x2, int y2, int width, SDL_Color color);
 	void DrawCircle(int x, int y, int r, int w, SDL_Color color, int accuracy = 32);
-	void DrawBackground(const std::string& texture_path);
-	void Raise();
+	[[maybe_unused]] void DrawBackground(const std::string& texture_path);
+	[[maybe_unused]] void Raise();
+	
+	std::pair<int, int> getScreenSize();
 	
 	[[nodiscard]] bool isRunning() const;
 	void join_quit_handler();
 	
-	[[nodiscard]] SDL_Renderer *getRenderer() const;
-	[[nodiscard]] SDL_Window *getWindow() const;
+	[[nodiscard]] [[maybe_unused]] SDL_Renderer *getRenderer() const;
+	[[nodiscard]] [[maybe_unused]] SDL_Window *getWindow() const;
 };
 
 #endif //SDL_GAME_WINDOW_HPP

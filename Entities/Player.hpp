@@ -22,10 +22,11 @@ private:
 	SDL_Rect boat_position = {0, 0, 0, 0};
 	SDL_Color sonar_color;
 public:
-	[[nodiscard]] PlayerState getState() const;
+	[[nodiscard]] [[maybe_unused]] PlayerState getState() const;
+	void setState(PlayerState state);
 	
 	Player();
-	Player(const SDL_Rect& rect, const Design& design);
+	[[maybe_unused]] Player(const SDL_Rect& rect, const Design& design);
 	
 	[[nodiscard]] SDL_Rect getBoatPosition() const;
 	[[nodiscard]] [[maybe_unused]] SDL_Color getSonarColor() const;

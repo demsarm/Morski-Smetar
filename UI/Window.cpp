@@ -290,3 +290,11 @@ std::pair<int, int> Window::getWindowsPosition() {
 void Window::setWindowsPosition(int x, int y) {
 	SDL_SetWindowPosition(window, x, y);
 }
+
+std::pair<int, int> Window::getScreenSize() {
+	SDL_DisplayMode displayMode;
+	int windowDisplayIndex = SDL_GetWindowDisplayIndex(window);
+	if (!SDL_GetCurrentDisplayMode(windowDisplayIndex, &displayMode)){
+		return {displayMode.w, displayMode.h};
+	} else return { 800, 600 };
+}
