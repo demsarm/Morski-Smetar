@@ -91,7 +91,11 @@ void Player::Update() {
 			switch_delay = 300;
 		}
 	}
-	if (isColliding(getRect() + (SDL_Rect){getRect().w, 0, 0, 0}, {boat_position.x - WindowData::SCREEN_WIDTH/12, boat_position.y - 50, boat_position.w + WindowData::SCREEN_WIDTH/6, boat_position.h + 100})) {
+	if (isColliding(getRect() + (SDL_Rect){getRect().w, 0, 0, 0},
+					{boat_position.x - WindowData::SCREEN_WIDTH/8,
+					    boat_position.y - 50,
+						boat_position.w + WindowData::SCREEN_WIDTH/4,
+						boat_position.h + 100})) {
 		if (kbd_state[SDL_SCANCODE_E] && switch_delay <= 0) {
 			state = EMBARKED;
 			setRect(boat_position);
@@ -113,4 +117,20 @@ Player::PlayerState Player::getState() const {
 
 SDL_Rect Player::getBoatPosition() const {
 	return boat_position;
+}
+
+void Player::setSonarColor(const SDL_Color &color) {
+	sonar_color = color;
+}
+
+SDL_Color Player::getSonarColor() const {
+	return sonar_color;
+}
+
+/* @brief Sets the boat position
+ * @param rect The new boat position
+ * @warning This may mess with the game's logic, so avoid this if you don't know what you are doing
+ */
+void Player::setBoatPosition(const SDL_Rect &rect) {
+	boat_position = rect;
 }

@@ -27,6 +27,7 @@ public:
 	static void setWindowSize(int percent);
 	static void setWindowSize(int w, int h);
 	static void setWindowSize(std::pair<int, int> size);
+	void changeWindowSize(int w, int h);
 	
 	Window(const char *title, int x, int y, int w, int h, Uint32 flags);
 	~Window();
@@ -38,6 +39,8 @@ public:
 	void Draw(const SDL_Rect& rect, const std::string& texture_path);
 	void Draw(const GameObject& object, double angle = 0.0, SDL_RendererFlip flip = SDL_FLIP_NONE);
 	void Draw(const Text& text);
+	void DrawLine(int x1, int y1, int x2, int y2, int width, SDL_Color color);
+	void DrawCircle(int x, int y, int r, int w, SDL_Color color, int accuracy = 32);
 	void DrawBackground(const std::string& texture_path);
 	void Raise();
 	

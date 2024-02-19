@@ -20,13 +20,18 @@ private:
 	PlayerState state = EMBARKED;
 	int switch_delay = 0;
 	SDL_Rect boat_position = {0, 0, 0, 0};
+	SDL_Color sonar_color;
 public:
 	[[nodiscard]] PlayerState getState() const;
 	
 	Player();
 	Player(const SDL_Rect& rect, const Design& design);
 	
-	SDL_Rect getBoatPosition() const;
+	[[nodiscard]] SDL_Rect getBoatPosition() const;
+	[[nodiscard]] [[maybe_unused]] SDL_Color getSonarColor() const;
+	
+	[[maybe_unused]] void setSonarColor(const SDL_Color& color);
+	[[maybe_unused]] void setBoatPosition(const SDL_Rect& rect);
 	
 	[[nodiscard]] bool isFacingRight() const;
 	[[nodiscard]] bool isFacingLeft() const;

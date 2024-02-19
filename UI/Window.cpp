@@ -255,3 +255,30 @@ void Window::Draw(const Text &text) {
 	SDL_DestroyTexture(texture);
 	TTF_CloseFont(font);
 }
+
+void Window::DrawLine(int x1, int y1, int x2, int y2, int width, SDL_Color color) {
+	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+	for (int i = width/2; i > -width/2; --i){
+		SDL_RenderDrawLine(renderer, x1 + i, y1, x2 + i, y2);
+	}
+	
+}
+
+void Window::DrawCircle(int x, int y, int r, int w, SDL_Color color, int accuracy) {
+	int n = 32;
+	for (int i = 0; i < n; i++){
+		DrawLine(r * sin(2 * M_PI * i / accuracy) + x,
+		                r * cos(2 * M_PI * i / accuracy) + y,
+		                r * sin(2 * M_PI * (i + 1) / accuracy) + x,
+						r * cos(2 * M_PI * (i + 1) / accuracy) + y,
+		                5, color);
+		
+	}
+	
+}
+
+void Window::changeWindowSize(int w, int h) {
+	SDL_SetWindowSize(window, w, h);
+}
+
+
