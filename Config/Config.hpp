@@ -13,6 +13,11 @@ namespace WindowData {
 
 namespace Config{
 	extern int ENEMY_ATTACK_CD;
+	extern int PLAYER_SIGHT_RANGE;
+	extern int ALLY_SIGHT_RANGE;
+	
+	extern int ENEMY_SIGHT_RANGE;
+	extern int ENEMY_LINK_RANGE;
 }
 
 #endif //MORSKI_SMETAR_CONFIG_HPP

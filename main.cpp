@@ -108,7 +108,7 @@ int main() {
 						if (other != enemies[i] && sqrt(
 								pow(other.getRect().x - enemies[i].getRect().x, 2) +
 								pow(other.getRect().y - enemies[i].getRect().y, 2)) <
-						                           (double) WindowData::SCREEN_WIDTH / 6) {
+						                           (double) Config::ENEMY_LINK_RANGE) {
 							game = true;
 							break;
 						}
@@ -122,19 +122,20 @@ int main() {
 					}
 				}
 				
-				if ((int) (sqrt(pow(player.getRect().x - enemies[i].getRect().x, 2) +
-				                pow(player.getRect().y - enemies[i].getRect().y, 2))) < WindowData::SCREEN_WIDTH / 6) {
+				if ((int) (sqrt(
+								pow(player.getRect().x - enemies[i].getRect().x, 2) +
+								   pow(player.getRect().y - enemies[i].getRect().y, 2))) < Config::PLAYER_SIGHT_RANGE) {
 					window.Draw(enemies[i]);
 				}
 			}
 			
 			
 			window.DrawCircle(player.getRect().x + player.getRect().w / 2, player.getRect().y + player.getRect().h / 2,
-			                  WindowData::SCREEN_WIDTH / 6, 10, player.getSonarColor(), 32);
+			                  Config::PLAYER_SIGHT_RANGE, 10, player.getSonarColor(), 32);
 			window.DrawCircle(player.getRect().x + player.getRect().w / 2, player.getRect().y + player.getRect().h / 2,
 			                  Data::sonar, 10, player.getSonarColor(), 32);
 			++Data::sonar;
-			if (Data::sonar > WindowData::SCREEN_WIDTH / 6) {
+			if (Data::sonar > Config::PLAYER_SIGHT_RANGE) {
 				Data::sonar = 0;
 			}
 			player.Update();

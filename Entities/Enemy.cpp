@@ -64,10 +64,10 @@ void Enemy::Attack() {
 		return;
 	} // just for safety (in case player is not set yet)
 	
-	if (sqrt(pow(player->getRect().x - rect.x, 2) + pow(player->getRect().y - rect.y, 2)) < (double)WindowData::SCREEN_WIDTH / 6) {
+	if (sqrt(pow(player->getRect().x - rect.x, 2) + pow(player->getRect().y - rect.y, 2)) < (double)Config::ENEMY_SIGHT_RANGE) {
 		bool att = false;
 		for (auto &other : *enemies) {
-			if (other != *this && sqrt(pow(other.getRect().x - rect.x, 2) + pow(other.getRect().y - rect.y, 2)) < (double)WindowData::SCREEN_WIDTH / 6) {
+			if (other != *this && sqrt(pow(other.getRect().x - rect.x, 2) + pow(other.getRect().y - rect.y, 2)) < (double)Config::ENEMY_LINK_RANGE) {
 				att = true;
 				break;
 			}
@@ -101,14 +101,14 @@ void Enemy::Retreat() {
 		return;
 	} // just for safety (in case player is not set yet)
 	
-	if (sqrt(pow(player->getRect().x - rect.x, 2) + pow(player->getRect().y - rect.y, 2)) > (double)WindowData::SCREEN_WIDTH / 6) {
+	if (sqrt(pow(player->getRect().x - rect.x, 2) + pow(player->getRect().y - rect.y, 2)) > (double)Config::ENEMY_SIGHT_RANGE) {
 		state = IDLE;
 		axis = (Axis) Random::randint(0, 2);
 		direction = (Direction) Random::randint(0, 2);
 	} else {
 		bool run = true;
 		for (auto &other : *enemies) {
-			if (other != *this && sqrt(pow(other.getRect().x - rect.x, 2) + pow(other.getRect().y - rect.y, 2)) < (double)WindowData::SCREEN_WIDTH / 6) {
+			if (other != *this && sqrt(pow(other.getRect().x - rect.x, 2) + pow(other.getRect().y - rect.y, 2)) < (double)Config::ENEMY_LINK_RANGE) {
 				run = false;
 				break;
 			}
