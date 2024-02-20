@@ -18,6 +18,7 @@
 #include "Config/Config.hpp"
 #include "Config/Data.hpp"
 #include "Entities/Enemy.hpp"
+#include "Entities/Friendly.hpp"
 
 using namespace std;
 
@@ -64,6 +65,11 @@ int main() {
 		enemies.push_back(enemy);
 	}
 	
+	std::vector<Friendly> friendlies;
+	for (int i = Data::difficulty; i--;) {
+		friendlies.push_back(Friendly());
+	}
+	
 	Text score;
 	score.setText(string("Score-O-Meter"));
 	score.setFontPath(string("Assets/Fonts/VCR_OSD_MONO.ttf"));
@@ -92,6 +98,13 @@ int main() {
 					trash.erase(trash.begin() +
 					            (int64_t) i); // Yes that is how I cast to long I may or may not be chronically deranged
 					++Data::score;
+				}
+				for (auto & friendly : friendlies) {
+					if (isColliding(friendly, trash[i])) {
+						trash.erase(trash.begin() +
+						            (int64_t) i); // Yes that is how I cast to long I may or may not be chronically deranged
+						++Data::score;
+					}
 				}
 				if (trash[i].getRect().x > WindowData::SCREEN_WIDTH + 50) {
 					trash.erase(trash.begin() +
@@ -165,6 +178,16 @@ int main() {
 				}
 			}
 			
+			for (uint64_t i = friendlies.size(); i--;) {
+				friendlies[i].Update();
+				if (isColliding(player, friendlies[i])) {
+					friendlies.erase(friendlies.begin() +
+					                 (int64_t) i); // Yes that is how I cast to long I may or may not be chronically deranged
+					--Data::score;
+				} else {
+					window.Draw(friendlies[i], 0.0, friendlies[i].getDirection() == Friendly::Direction::NEGATIVE ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL);
+				}
+			}
 			
 			window.DrawCircle(player.getRect().x + player.getRect().w / 2, player.getRect().y + player.getRect().h / 2,
 			                  Config::PLAYER_SIGHT_RANGE, 10, player.getSonarColor(), 32);
@@ -242,6 +265,10 @@ int main() {
 							Trash(Random::randint(WindowData::SCREEN_WIDTH / 3,
 							                      (WindowData::SCREEN_WIDTH * 2) / 3 - 50),
 							      Random::randint(WindowData::SCREEN_HEIGHT - 50)));
+				}
+				friendlies.clear();
+				for (int i = Data::difficulty; i--;) {
+					friendlies.push_back(Friendly());
 				}
 				if (800 + 100 * Data::difficulty < window.getScreenSize().first) {
 					std::pair<int, int> pos = window.getWindowsPosition();

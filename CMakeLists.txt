@@ -35,6 +35,8 @@ add_executable(Morski_Smetar main.cpp
         Entities/Enemy.hpp
         Tools/Math.cpp
         Tools/Math.hpp
+        Entities/Friendly.cpp
+        Entities/Friendly.hpp
 )
 
 target_link_libraries(Morski_Smetar SDL2::SDL2)
