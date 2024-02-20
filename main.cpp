@@ -278,7 +278,7 @@ int main() {
 				
 				land.setColor((SDL_Color) {220, 220, 120, 255});
 				land.setRect({0, 0, WindowData::SCREEN_WIDTH / 3, WindowData::SCREEN_HEIGHT});
-			}
+			} // Restart code
 		}
 	}
 }

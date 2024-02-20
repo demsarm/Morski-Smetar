@@ -1,7 +1,3 @@
-//
-// Created by martind on 17.2.2024.
-//
-
 #ifndef MORSKI_SMETAR_CONFIG_HPP
 #define MORSKI_SMETAR_CONFIG_HPP
 
