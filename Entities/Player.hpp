@@ -15,7 +15,7 @@ public: // This is why C# handles public and private better
 	};
 	
 private:
-	int speed = 10;
+	int speed = 5;
 	bool facing_right = true;
 	PlayerState state = EMBARKED;
 	int switch_delay = 0;
