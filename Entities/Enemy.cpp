@@ -53,9 +53,14 @@ void Enemy::Idle() {
 	}
 	
 	if (sqrt(pow(player->getRect().x - rect.x, 2) + pow(player->getRect().y - rect.y, 2)) < (double)WindowData::SCREEN_WIDTH / 6) {
-		state = ATTACK;
-		attack_cd = Config::ENEMY_ATTACK_CD;
-		Attack();
+		if (player->getState() == Player::DISEMBARKED ){
+			state = ATTACK;
+			attack_cd = Config::ENEMY_ATTACK_CD;
+			Attack();
+		} else {
+			state = RETREAT;
+			Retreat();
+		}
 	}
 }
 
@@ -64,7 +69,7 @@ void Enemy::Attack() {
 		return;
 	} // just for safety (in case player is not set yet)
 	
-	if (sqrt(pow(player->getRect().x - rect.x, 2) + pow(player->getRect().y - rect.y, 2)) < (double)Config::ENEMY_SIGHT_RANGE) {
+	if (sqrt(pow(player->getRect().x - rect.x, 2) + pow(player->getRect().y - rect.y, 2)) < (double)Config::ENEMY_SIGHT_RANGE && player->getState() == Player::DISEMBARKED) {
 		bool att = false;
 		for (auto &other : *enemies) {
 			if (other != *this && sqrt(pow(other.getRect().x - rect.x, 2) + pow(other.getRect().y - rect.y, 2)) < (double)Config::ENEMY_LINK_RANGE) {
@@ -132,6 +137,14 @@ void Enemy::Retreat() {
 			}
 		}
 	}
+}
+
+Enemy::Axis Enemy::getAxis() {
+	return axis;
+}
+
+void Enemy::setAxis(Enemy::Axis new_axis) {
+	axis = new_axis;
 }
 
 

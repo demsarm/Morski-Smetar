@@ -193,6 +193,13 @@ int main() {
 					               Random::randint(WindowData::SCREEN_HEIGHT / 12, WindowData::SCREEN_HEIGHT * 11 / 12),
 					               60,
 					               65});
+					for (auto &other: enemies) {
+						if (sqrt(
+								pow(other.getRect().x - enemy.getRect().x, 2) +
+								   pow(other.getRect().y - enemy.getRect().y, 2)) < (double) Config::ENEMY_LINK_RANGE) {
+							enemy.setAxis(other.getAxis() == Enemy::Axis::X ? Enemy::Axis::Y : Enemy::Axis::X);
+						}
+					}
 					enemies.push_back(enemy);
 				}
 				for (int i = 10; i--;) {

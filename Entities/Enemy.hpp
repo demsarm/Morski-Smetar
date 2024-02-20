@@ -7,6 +7,7 @@
 #include "Player.hpp"
 
 class Enemy : public GameObject {
+public:
 	enum Axis {
 		X,
 		Y
@@ -20,7 +21,7 @@ class Enemy : public GameObject {
 		RETREAT,
 		IDLE
 	};
-	
+private:
 	Axis axis;
 	Direction direction;
 	State state;
@@ -41,6 +42,9 @@ public:
 	static void setEnemies(std::vector<Enemy> * enemiesptr);
 	static void setPlayer(Player * playerptr);
 	
+	Axis getAxis();
+	
+	void setAxis(Enemy::Axis new_axis);
 };
 
 
