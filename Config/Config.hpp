@@ -1,6 +1,8 @@
 #ifndef MORSKI_SMETAR_CONFIG_HPP
 #define MORSKI_SMETAR_CONFIG_HPP
 
+// Data about how the game should run
+
 namespace WindowData {
 	extern int SCREEN_WIDTH;
 	extern int SCREEN_HEIGHT;

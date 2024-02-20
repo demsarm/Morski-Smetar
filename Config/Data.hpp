@@ -1,6 +1,8 @@
 #ifndef MORSKI_SMETAR_DATA_HPP
 #define MORSKI_SMETAR_DATA_HPP
 
+// Data used during the game
+
 namespace Data {
 	extern int score;
 	extern int difficulty;

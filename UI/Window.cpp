@@ -233,6 +233,10 @@ void Window::setWindowSize(std::pair<int, int> size) {
 	WindowData::SCREEN_HEIGHT = size.second;
 }
 
+/**
+ * @brief Draws a texture to the background
+ * @param texture_path The path to the texture
+ */
 void Window::DrawBackground(const std::string &texture_path) {
 	SDL_Texture * texture = IMG_LoadTexture(renderer, absolutePath(texture_path).c_str());
 	SDL_RenderCopy(renderer, texture, nullptr, nullptr);
@@ -256,6 +260,15 @@ void Window::Draw(const Text &text) {
 	TTF_CloseFont(font);
 }
 
+/**
+ * @brief Draws a line to the screen
+ * @param x1 The x position of the first point
+ * @param y1 The y position of the first point
+ * @param x2 The x position of the second point
+ * @param y2 The y position of the second point
+ * @param width The width of the line
+ * @param color The color of the line
+ */
 void Window::DrawLine(int x1, int y1, int x2, int y2, int width, SDL_Color color) {
 	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 	for (int i = width/2; i > -width/2; --i){
@@ -264,6 +277,16 @@ void Window::DrawLine(int x1, int y1, int x2, int y2, int width, SDL_Color color
 	
 }
 
+/**
+ * @brief Draws a circle to the screen
+ * @param x The x position of the circle
+ * @param y The y position of the circle
+ * @param r The radius of the circle
+ * @param w The width of the circle
+ * @param color The color of the circle
+ * @param accuracy The accuracy of the circle
+ * @note This does NOT actually draw a circle, but rather a polygon - drawing a circle tends to be very slow and when accuracy is high enough, it really doesn't matter
+ */
 void Window::DrawCircle(int x, int y, int r, int w, SDL_Color color, int accuracy) {
 	int n = 32;
 	for (int i = 0; i < n; i++){
@@ -277,20 +300,49 @@ void Window::DrawCircle(int x, int y, int r, int w, SDL_Color color, int accurac
 	
 }
 
+/**
+ * @brief Changes the window size
+ * @param w The width of the window
+ * @param h The height of the window
+ */
 void Window::changeWindowSize(int w, int h) {
 	SDL_SetWindowSize(window, w, h);
 }
 
+/**
+ * @brief Returns the position of the window
+ * @return The position of the window
+ */
 std::pair<int, int> Window::getWindowsPosition() {
 	int x, y;
 	SDL_GetWindowPosition(window, &x, &y);
 	return {x, y};
 }
 
+/**
+ * @brief Sets the position of the window
+ * @param x The x position of the window
+ * @param y The y position of the window
+ */
 void Window::setWindowsPosition(int x, int y) {
 	SDL_SetWindowPosition(window, x, y);
 }
 
+/**
+ * @brief Centers the window
+ */
+void Window::centerWindow() {
+	SDL_DisplayMode displayMode;
+	int windowDisplayIndex = SDL_GetWindowDisplayIndex(window);
+	if (!SDL_GetCurrentDisplayMode(windowDisplayIndex, &displayMode)){
+		SDL_SetWindowPosition(window, displayMode.w / 2 - WindowData::SCREEN_WIDTH / 2, displayMode.h / 2 - WindowData::SCREEN_HEIGHT / 2);
+	}
+}
+
+/**
+ * @brief Returns the screen size
+ * @return The screen size
+ */
 std::pair<int, int> Window::getScreenSize() {
 	SDL_DisplayMode displayMode;
 	int windowDisplayIndex = SDL_GetWindowDisplayIndex(window);

@@ -1,10 +1,6 @@
-//
-// Created by martind on 17.2.2024.
-//
-
 #include "Config.hpp"
 
-
+// Data about how the game should run
 
 namespace WindowData {
 	int SCREEN_WIDTH = 800;

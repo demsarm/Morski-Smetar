@@ -14,7 +14,7 @@ class Trash : public GameObject {
 			"Assets/Trash-Box.png",
 			"Assets/Trash-Can.png",
 			"Assets/Trash-Bottle.png",
-	};
+	}; // I made this before I knew about enums, but I don't feel like changing it
 	
 	uint8_t type;
 	

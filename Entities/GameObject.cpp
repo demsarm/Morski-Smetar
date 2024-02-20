@@ -73,4 +73,7 @@ void GameObject::setRect(const SDL_Rect& rect1) {
 	this->rect = rect1;
 }
 
+/**
+ * Does nothing by default - to be overridden by child classes
+ */
 void GameObject::Update() { }

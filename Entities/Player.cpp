@@ -14,6 +14,11 @@
  */
 Player::Player() : facing_right(true), sonar_color(){}
 
+/**
+ * Constructor for the Player class.
+ * @param rect The rectangle to initialize the player with
+ * @param design The design to initialize the player with
+ */
 [[maybe_unused]] Player::Player(const SDL_Rect& rect, const Design& design) : facing_right(true) {
 	this->rect = rect;
 	this->design = design;
@@ -34,10 +39,16 @@ Player::Player() : facing_right(true), sonar_color(){}
  */
 Player::~Player() = default;
 
+/**
+ * @biref Tells you if the player is facing right
+ */
 [[maybe_unused]] bool Player::isFacingRight() const {
 	return facing_right;
 }
 
+/**
+ * @biref Tells you if the player is facing left
+ */
 [[maybe_unused]] bool Player::isFacingLeft() const {
 	return !facing_right;
 }
@@ -50,6 +61,19 @@ Player &Player::operator=(const Player &other) {
 	return *this;
 }
 
+/**
+ * @brief Updates the state of the Player object based on keyboard inputs.
+ *
+ * This function checks the current state of the keyboard and updates the Player object accordingly.
+ * The player can move up, down, left, or right based on the 'W', 'S', 'A', and 'D' keys respectively.
+ * The speed of the player is determined by the 'speed' variable.
+ * The player's state can be either EMBARKED or DISEMBARKED.
+ * If the player is EMBARKED, they can move within the entire screen width.
+ * If the player is DISEMBARKED, they can only move within a third of the screen width.
+ * The player's state can be switched between EMBARKED and DISEMBARKED by pressing the 'E' key.
+ * The switch can only occur if the player is colliding with a certain area of the screen and if the switch delay is 0.
+ * After a switch, the switch delay is set to 300.
+ */
 void Player::Update() {
 	const Uint8 *kbd_state = SDL_GetKeyboardState(nullptr);
 	if (kbd_state[SDL_SCANCODE_W]) {
@@ -112,19 +136,35 @@ void Player::Update() {
 	
 }
 
-Player::PlayerState Player::getState() const {
+/**
+ * @brief Returns the state of the Player object.
+ * @return The state of the Player object
+ */
+[[maybe_unused]] Player::PlayerState Player::getState() const {
 	return state;
 }
 
-SDL_Rect Player::getBoatPosition() const {
+/**
+ * @brief Returns the boat position of the Player object.
+ * @return The boat position of the Player object
+ */
+[[maybe_unused]] SDL_Rect Player::getBoatPosition() const {
 	return boat_position;
 }
 
-void Player::setSonarColor(const SDL_Color &color) {
+/**
+ * @brief Sets the sonar color of the Player object.
+ * @param color The color to set the sonar to
+ */
+[[maybe_unused]] void Player::setSonarColor(const SDL_Color &color) {
 	sonar_color = color;
 }
 
-SDL_Color Player::getSonarColor() const {
+/**
+ * @brief Returns the sonar color of the Player object.
+ * @return The sonar color of the Player object
+ */
+[[maybe_unused]] SDL_Color Player::getSonarColor() const {
 	return sonar_color;
 }
 
@@ -136,6 +176,10 @@ void Player::setBoatPosition(const SDL_Rect &rect) {
 	boat_position = rect;
 }
 
+/**
+ * @brief Sets the state of the Player object.
+ * @param new_state The new state to set the Player object to
+ */
 void Player::setState(Player::PlayerState new_state) {
 	state = new_state;
 }

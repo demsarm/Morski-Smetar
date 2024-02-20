@@ -11,6 +11,9 @@ Wave::Wave(int x, int y) {
 
 Wave::~Wave() = default;
 
+/**
+ * @brief Literally just moves the wave to the left and resets it when it goes off screen
+ */
 void Wave::Update() {
 	rect.x -= 1;
 	if (rect.x < 200) {

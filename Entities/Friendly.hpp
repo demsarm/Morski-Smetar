@@ -34,7 +34,7 @@ public:
 	void Update() override;
 
 	[[nodiscard]] [[maybe_unused]] Axis getAxis() const;
-	[[maybe_unused]] void setAxis(Axis axis);
+	[[maybe_unused]] void setAxis(Axis newaxis);
 	
 	[[nodiscard]] Direction getDirection() const;
 	[[maybe_unused]] void setDirection(Direction direction);

@@ -2,6 +2,10 @@
 
 using namespace Random;
 
+/**
+ * @brief Returns a random number between 0 and 1
+ * @return A random number between 0 and 1
+ */
 double Random::value() {
 	std::random_device rd;
 	std::mt19937 gen(rd());

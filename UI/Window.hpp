@@ -54,6 +54,8 @@ public:
 	
 	[[nodiscard]] [[maybe_unused]] SDL_Renderer *getRenderer() const;
 	[[nodiscard]] [[maybe_unused]] SDL_Window *getWindow() const;
+	
+	void centerWindow();
 };
 
 #endif //SDL_GAME_WINDOW_HPP

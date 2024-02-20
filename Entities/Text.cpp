@@ -1,5 +1,7 @@
 #include "Text.hpp"
 
+// It's just a bunch of getter and setters - I'm not wasting my time adding docstrings to this
+
 Text::Text() : font_size(0) {}
 
 // Clang-Tidy: Pass by value and use std::move (iont feel like it)
