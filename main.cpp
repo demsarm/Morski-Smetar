@@ -50,6 +50,7 @@ int main() {
 	}
 	
 	std::vector<Trash> trash;
+	Enemy::setTrashes(&trash);
 	for (int i = 10; i--;) {
 		trash.push_back(Trash(Random::randint(WindowData::SCREEN_WIDTH / 3, (WindowData::SCREEN_WIDTH * 2) / 3 - 50),
 		                      Random::randint(WindowData::SCREEN_HEIGHT - 50)));

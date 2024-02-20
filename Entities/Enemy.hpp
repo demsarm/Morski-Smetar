@@ -5,6 +5,7 @@
 #include <vector>
 #include "GameObject.hpp"
 #include "Player.hpp"
+#include "Trash.hpp"
 
 class Enemy : public GameObject {
 public:
@@ -19,7 +20,8 @@ public:
 	enum State {
 		ATTACK,
 		RETREAT,
-		IDLE
+		IDLE,
+		POLLUTING
 	};
 private:
 	Axis axis;
@@ -29,11 +31,13 @@ private:
 	void Idle();
 	void Attack();
 	void Retreat();
+	void Pollute();
 	
 	int attack_cd;
 	
 	static Player * player;
 	static std::vector<Enemy> * enemies;
+	static std::vector<Trash> * trashes;
 public:
 	bool operator!=(const Enemy & other) const;
 	Enemy();
@@ -41,6 +45,7 @@ public:
 	
 	static void setEnemies(std::vector<Enemy> * enemiesptr);
 	static void setPlayer(Player * playerptr);
+	static void setTrashes(std::vector<Trash> * trashesptr);
 	
 	Axis getAxis();
 	

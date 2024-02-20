@@ -9,7 +9,9 @@
 #include "../Tools/Overloads.hpp"
 
 std::vector<Enemy> * Enemy::enemies = nullptr;
+std::vector<Trash> * Enemy::trashes = nullptr;
 Player * Enemy::player = nullptr;
+
 
 bool Enemy::operator!=(const Enemy &other) const {
 	return rect != other.rect;
@@ -34,32 +36,40 @@ void Enemy::Update() {
 		Idle();
 	} else if (state == ATTACK) { // state == ATTACK
 		Attack();
-	} else { // state == RETREAT
+	} else if (state == RETREAT) { // state == RETREAT
 		Retreat();
+	} else if (state == POLLUTING) { // state == POLLUTING
+		Pollute();
 	}
 }
 
 void Enemy::Idle() {
-	if (axis == X) {
-		rect.x += direction == POSITIVE ? 1 : -1;
-	} else { // axis == Y
-		rect.y += direction == POSITIVE ? 1 : -1;
-	}
-	if (rect.x < 0 || rect.x > WindowData::SCREEN_WIDTH / 3 - rect.w) {
-		direction = direction == POSITIVE ? NEGATIVE : POSITIVE;
-	}
-	if (rect.y < 0 || rect.y > WindowData::SCREEN_HEIGHT - rect.h) {
-		direction = direction == POSITIVE ? NEGATIVE : POSITIVE;
-	}
-	
-	if (sqrt(pow(player->getRect().x - rect.x, 2) + pow(player->getRect().y - rect.y, 2)) < (double)WindowData::SCREEN_WIDTH / 6) {
-		if (player->getState() == Player::DISEMBARKED ){
-			state = ATTACK;
-			attack_cd = Config::ENEMY_ATTACK_CD;
-			Attack();
-		} else {
-			state = RETREAT;
-			Retreat();
+	if (Random::randint(2000) <= 1){
+		state = POLLUTING;
+		Pollute();
+	} else {
+		if (axis == X) {
+			rect.x += direction == POSITIVE ? 1 : -1;
+		} else { // axis == Y
+			rect.y += direction == POSITIVE ? 1 : -1;
+		}
+		if (rect.x < 0 || rect.x > WindowData::SCREEN_WIDTH / 3 - rect.w) {
+			direction = direction == POSITIVE ? NEGATIVE : POSITIVE;
+		}
+		if (rect.y < 0 || rect.y > WindowData::SCREEN_HEIGHT - rect.h) {
+			direction = direction == POSITIVE ? NEGATIVE : POSITIVE;
+		}
+		
+		if (sqrt(pow(player->getRect().x - rect.x, 2) + pow(player->getRect().y - rect.y, 2)) <
+		    (double) WindowData::SCREEN_WIDTH / 6) {
+			if (player->getState() == Player::DISEMBARKED) {
+				state = ATTACK;
+				attack_cd = Config::ENEMY_ATTACK_CD;
+				Attack();
+			} else {
+				state = RETREAT;
+				Retreat();
+			}
 		}
 	}
 }
@@ -145,6 +155,27 @@ Enemy::Axis Enemy::getAxis() {
 
 void Enemy::setAxis(Enemy::Axis new_axis) {
 	axis = new_axis;
+}
+
+void Enemy::Pollute() {
+	if (rect.x > WindowData::SCREEN_WIDTH / 4 - rect.w) {
+		if (trashes == nullptr) {
+			return;
+		} else {
+			Trash trash(WindowData::SCREEN_WIDTH/3 + 10, rect.y + 7);
+			// enemy is 65 tall, trash is 50 tall
+			// 65 / 2 - 50 /2 = 15/2 = ~7
+			trashes->push_back(trash);
+		}
+		state = IDLE;
+	}
+	else {
+		rect.x += 1;
+	}
+}
+
+void Enemy::setTrashes(std::vector<Trash> *trashesptr) {
+	trashes = trashesptr;
 }
 
 
