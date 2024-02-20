@@ -103,6 +103,41 @@ int main() {
 			
 			for (uint64_t i = enemies.size(); i--;) {
 				enemies[i].Update();
+				for (auto &other: enemies) {
+					if (isColliding(enemies[i], other) && enemies[i] != other && distance(enemies[i].getRect().x, enemies[i].getRect().y, player.getRect().x, player.getRect().y) < (double) Config::PLAYER_SIGHT_RANGE) {
+						GameObject warn;
+						warn.setPath("Assets/Exclamation.png");
+						warn.setRect({enemies[i].getRect().x + enemies[i].getRect().w / 2 - 20,
+						              enemies[i].getRect().y - 60, 30, 55});
+						window.Draw(warn);
+					}
+					if (other != enemies[i] &&
+						distance(enemies[i].getRect().x, enemies[i].getRect().y, other.getRect().x, other.getRect().y) < (double) Config::ENEMY_LINK_RANGE &&
+						distance(player.getRect().x, player.getRect().y, enemies[i].getRect().x, enemies[i].getRect().y) < (double) Config::PLAYER_SIGHT_RANGE) {
+							if (distance(player.getRect().x, player.getRect().y, other.getRect().x, other.getRect().y) < (double)Config::PLAYER_SIGHT_RANGE) {
+								window.DrawLine(
+										enemies[i].getRect().x + enemies[i].getRect().w / 2,
+										enemies[i].getRect().y + enemies[i].getRect().h / 2,
+										other.getRect().x + other.getRect().w / 2,
+										other.getRect().y + other.getRect().h / 2,
+										3, (SDL_Color) {255, 0, 0,
+										                255}); // This will reveal the location of SOME enemies, but it does make the game fairer
+							} else {
+								std::pair<int, int> inter = line_circle_intersection(
+										enemies[i].getRect().x + enemies[i].getRect().w / 2, enemies[i].getRect().y + enemies[i].getRect().h / 2,
+										other.getRect().x + other.getRect().w / 2, other.getRect().y + other.getRect().h / 2,
+										player.getRect().x + player.getRect().w / 2, player.getRect().y + player.getRect().h / 2,
+										Config::PLAYER_SIGHT_RANGE);
+								if (inter.first != -1) {
+									window.DrawLine(
+											enemies[i].getRect().x + enemies[i].getRect().w / 2,
+											enemies[i].getRect().y + enemies[i].getRect().h / 2,
+											inter.first, inter.second,
+											3, (SDL_Color) {255, 0, 0, 255});
+								}
+							}
+					}
+				}
 				if (isColliding(player, enemies[i])) {
 					bool game = false;
 					for (auto &other: enemies) {
