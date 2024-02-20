@@ -6,6 +6,8 @@
 #include "../Config/Config.hpp"
 #include "../Tools/Random.hpp"
 
+SDL_Color Friendly::sonar_color = {255, 255, 255, 255};
+
 Friendly::Friendly() : GameObject(){
 	SDL_Rect tmp = {Random::value() < 0.3 ? Random::randint(WindowData::SCREEN_WIDTH / 12, WindowData::SCREEN_WIDTH / 4 - 70) :
 					    Random::randint((int) (WindowData::SCREEN_WIDTH * 21 / 30), (int) (WindowData::SCREEN_WIDTH * 0.9) - 70),
@@ -69,4 +71,16 @@ Friendly::Direction Friendly::getDirection() const {
 
 void Friendly::setDirection(Friendly::Direction direction) {
 	Friendly::direction = direction;
+}
+
+[[maybe_unused]] Friendly::Type Friendly::getType() const {
+	return type;
+}
+
+void Friendly::setSonarColor(SDL_Color newcolor) {
+	Friendly::sonar_color = newcolor;
+}
+
+SDL_Color Friendly::getSonarColor() {
+	return sonar_color;
 }

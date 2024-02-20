@@ -20,7 +20,7 @@ Trash::Trash(int x, int y) : GameObject() {
 	offset = Random::randint(0, 50);
 }
 
-Trash::Trash(const Trash &other) = default;
+[[maybe_unused]] Trash::Trash(const Trash &other) = default;
 
 void Trash::Update() {
 	rect.x += 1;

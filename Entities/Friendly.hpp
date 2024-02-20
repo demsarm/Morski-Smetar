@@ -22,6 +22,8 @@ public:
 	};
 	
 private:
+	static SDL_Color sonar_color;
+	
 	Type type;
 	Axis axis;
 	Direction direction;
@@ -36,6 +38,11 @@ public:
 	
 	[[nodiscard]] Direction getDirection() const;
 	[[maybe_unused]] void setDirection(Direction direction);
+	
+	[[maybe_unused]] [[nodiscard]] Type getType() const;
+	
+	static void setSonarColor(SDL_Color newcolor);
+	static SDL_Color getSonarColor();
 };
 
 

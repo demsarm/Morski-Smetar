@@ -70,6 +70,7 @@ int main() {
 	for (int i = Data::difficulty; i--;) {
 		friendlies.push_back(Friendly());
 	}
+	Friendly::setSonarColor((SDL_Color) {0, 0x88, 0, 255}); // Consistent number bases are for the weak and the uninitiated (Disclaimer: I am weak, however I may or may not be initiated - I'm not sure)
 	
 	Text score;
 	score.setText(string("Score-O-Meter"));
@@ -171,8 +172,14 @@ int main() {
 						Data::isAlive = false;
 					}
 				}
-				
-				if ((int) (sqrt(
+				bool show = false;
+				for (auto & friendly : friendlies){
+					if (friendly.getType() == Friendly::Type::LAND && distance(friendly.getRect().x, friendly.getRect().y, enemies[i].getRect().x, enemies[i].getRect().y) <= (double) Config::ALLY_SIGHT_RANGE){
+						show = true;
+						break;
+					}
+				}
+				if (show || (int) (sqrt(
 								pow(player.getRect().x - enemies[i].getRect().x, 2) +
 								   pow(player.getRect().y - enemies[i].getRect().y, 2))) < Config::PLAYER_SIGHT_RANGE) {
 					window.Draw(enemies[i]);
@@ -186,10 +193,21 @@ int main() {
 					                 (int64_t) i); // Yes that is how I cast to long I may or may not be chronically deranged
 					--Data::score;
 				} else {
+					if (friendlies[i].getType() == Friendly::Type::LAND) {
+						window.DrawCircle(friendlies[i].getRect().x + friendlies[i].getRect().w / 2,
+						                  friendlies[i].getRect().y + friendlies[i].getRect().h / 2,
+						                  Data::friendly_sonar, 10, Friendly::getSonarColor(), 32);
+						window.DrawCircle(friendlies[i].getRect().x + friendlies[i].getRect().w / 2,
+						                  friendlies[i].getRect().y + friendlies[i].getRect().h / 2,
+						                  Config::ALLY_SIGHT_RANGE, 10, Friendly::getSonarColor(), 32);
+					}
 					window.Draw(friendlies[i], 0.0, friendlies[i].getDirection() == Friendly::Direction::NEGATIVE ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL);
 				}
 			}
-			
+			++Data::friendly_sonar;
+			if (Data::friendly_sonar > Config::ALLY_SIGHT_RANGE) {
+				Data::friendly_sonar = 0;
+			}
 			window.DrawCircle(player.getRect().x + player.getRect().w / 2, player.getRect().y + player.getRect().h / 2,
 			                  Config::PLAYER_SIGHT_RANGE, 10, player.getSonarColor(), 32);
 			window.DrawCircle(player.getRect().x + player.getRect().w / 2, player.getRect().y + player.getRect().h / 2,
@@ -242,7 +260,6 @@ int main() {
 			}
 			
 			window.Flip();
-			
 			if (enemies.empty() && trash.empty()) {
 				++Data::difficulty;
 				for (int i = Data::difficulty; i--;) {
