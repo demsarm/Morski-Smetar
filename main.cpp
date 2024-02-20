@@ -7,6 +7,7 @@
 #include "Tools/Random.hpp"
 #include "Tools/Collision.hpp"
 #include "Tools/Overloads.hpp"
+#include "Tools/Math.hpp"
 
 #include "Entities/GameObject.hpp"
 #include "Entities/Player.hpp"

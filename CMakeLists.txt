@@ -33,6 +33,8 @@ add_executable(Morski_Smetar main.cpp
         Tools/Overloads.hpp
         Entities/Enemy.cpp
         Entities/Enemy.hpp
+        Tools/Math.cpp
+        Tools/Math.hpp
 )
 
 target_link_libraries(Morski_Smetar SDL2::SDL2)
