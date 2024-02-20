@@ -7,10 +7,11 @@
 #include "../Tools/Random.hpp"
 
 Friendly::Friendly() : GameObject(){
-	setRect({Random::randint((int)(WindowData::SCREEN_WIDTH * 0.1), (int)(WindowData::SCREEN_WIDTH * 0.9) - 70), Random::randint((int)(WindowData::SCREEN_HEIGHT * 0.1), (int)(WindowData::SCREEN_HEIGHT * 0.9) - 60), 70, 60});
-	while (WindowData::SCREEN_WIDTH / 3 < rect.x && rect.x < WindowData::SCREEN_WIDTH / 3 + 70){
-		rect.x = Random::randint((int)(WindowData::SCREEN_WIDTH * 0.1), (int)(WindowData::SCREEN_WIDTH * 0.9) - 70);
-	}
+	SDL_Rect tmp = {Random::value() < 0.3 ? Random::randint(WindowData::SCREEN_WIDTH / 12, WindowData::SCREEN_WIDTH / 4 - 70) :
+					    Random::randint((int) (WindowData::SCREEN_WIDTH * 21 / 30), (int) (WindowData::SCREEN_WIDTH * 0.9) - 70),
+	                 Random::randint(WindowData::SCREEN_HEIGHT / 10, WindowData::SCREEN_HEIGHT * 9 / 10 - 60)
+					 , 70, 60};
+	setRect(tmp);
 	if (rect.x < WindowData::SCREEN_WIDTH / 3){
 		type = Type::LAND;
 	} else {
