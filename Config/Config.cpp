@@ -9,7 +9,7 @@
 namespace WindowData {
 	int SCREEN_WIDTH = 800;
 	int SCREEN_HEIGHT = 600;
-	int SCREEN_FPS = 60;
+	int SCREEN_FPS = 360;
 }
 
 namespace Config{

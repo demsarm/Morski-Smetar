@@ -296,6 +296,7 @@ int main() {
 				Config::ENEMY_SIGHT_RANGE = WindowData::SCREEN_WIDTH / 3;
 				Config::ENEMY_LINK_RANGE = WindowData::SCREEN_WIDTH / 4;
 			}
+			SDL_Delay(1000 / WindowData::SCREEN_FPS);
 		}
 		else { // Game Over
 			window.Clear((SDL_Color) {0, 0, 0, 255});
