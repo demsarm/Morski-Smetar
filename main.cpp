@@ -258,10 +258,18 @@ int main() {
 						600 + 100 * Data::difficulty < window.getScreenSize().second ? 600 + 100 * Data::difficulty : window.getScreenSize().second);
 				window.changeWindowSize(WindowData::SCREEN_WIDTH, WindowData::SCREEN_HEIGHT);
 				land.setRect({0, 0, WindowData::SCREEN_WIDTH / 3, WindowData::SCREEN_HEIGHT});
-				player.setBoatPosition(player.getBoatPosition() + (SDL_Rect) {100 / 3, 0, 0, 0});
+				player.setBoatPosition({0, 0, 0, 0});
+				player.setState(Player::EMBARKED);
+				player.setPath("Assets/Boat.png");
+				player.setRect({Random::randint((int) (WindowData::SCREEN_WIDTH * 21 / 30), (int) (WindowData::SCREEN_WIDTH * 0.9)),
+				                Random::randint(WindowData::SCREEN_HEIGHT / 10, WindowData::SCREEN_HEIGHT * 9 / 10), 160, 115});
+				Config::PLAYER_SIGHT_RANGE = WindowData::SCREEN_WIDTH / 2;
+				Config::ALLY_SIGHT_RANGE = WindowData::SCREEN_WIDTH / 4;
+				Config::ENEMY_SIGHT_RANGE = WindowData::SCREEN_WIDTH / 3;
+				Config::ENEMY_LINK_RANGE = WindowData::SCREEN_WIDTH / 4;
 			}
 		}
-		else {
+		else { // Game Over
 			window.Clear((SDL_Color) {0, 0, 0, 255});
 			if (Random::value() < 0.05) window.DrawBackground("Assets/Game.png");
 			std::string str = "Game Over";
