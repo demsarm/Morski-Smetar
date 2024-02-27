@@ -7,8 +7,8 @@
 
 #include <string>
 
-#include "GameObject.hpp"
-#include "SDL_ttf.h"
+#include "../Entities/GameObject.hpp"
+#include "SDL2/SDL_ttf.h"
 
 class Text : public GameObject{
 	std::string text;

@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.28)
 project(Morski_Smetar)
 
+link_directories(/usr/lib)
+
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
 find_package(SDL2_ttf REQUIRED)
@@ -11,7 +13,7 @@ add_executable(Morski_Smetar main.cpp
         Config/Config.cpp
         Config/Config.hpp
         UI/Window.cpp
-        UI/Window.cpp
+        UI/Window.hpp
         Entities/GameObject.cpp
         Entities/GameObject.hpp
         Entities/Player.cpp
@@ -21,14 +23,15 @@ add_executable(Morski_Smetar main.cpp
         Entities/Wave.cpp
         Entities/Wave.hpp
         Tools/Random.cpp
+        Tools/Random.hpp
         Entities/Trash.cpp
         Entities/Trash.hpp
         Tools/Collision.cpp
         Tools/Collision.hpp
         Config/Data.cpp
         Config/Data.hpp
-        Entities/Text.cpp
-        Entities/Text.hpp
+        UI/Text.cpp
+        UI/Text.hpp
         Tools/Overloads.cpp
         Tools/Overloads.hpp
         Entities/Enemy.cpp
@@ -37,8 +40,14 @@ add_executable(Morski_Smetar main.cpp
         Tools/Math.hpp
         Entities/Friendly.cpp
         Entities/Friendly.hpp
+        Game.cpp
+        Game.hpp
+        UI/Line.cpp
+        UI/Line.hpp
+        UI/Screen.cpp
+        UI/Screen.hpp
 )
 
-target_link_libraries(Morski_Smetar SDL2::SDL2)
+target_link_libraries(Morski_Smetar SDL2)
 target_link_libraries(Morski_Smetar SDL2_image)
 target_link_libraries(Morski_Smetar SDL2_ttf)

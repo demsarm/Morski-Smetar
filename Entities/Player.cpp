@@ -168,7 +168,8 @@ void Player::Update() {
 	return sonar_color;
 }
 
-/* @brief Sets the boat position
+/**
+ * @brief Sets the boat position
  * @param rect The new boat position
  * @warning This may mess with the game's logic, so avoid this if you don't know what you are doing
  */

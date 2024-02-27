@@ -1,5 +1,12 @@
 #include "Window.hpp"
 
+#include <cmath>
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif // Because x86_64-w64-mingw32-g++ doesn't know what M_PI is apparently
+
+
 std::pair<int, int> getScreenSize() {
 	SDL_Window *window = SDL_CreateWindow(
 			"You're not supposed to see this why can you see it something went horribly wrong I just want to know your resolution so I can base the actual window's size off of that please help me I'm stuck in a computer and I can't get out",
@@ -349,4 +356,110 @@ std::pair<int, int> Window::getScreenSize() {
 	if (!SDL_GetCurrentDisplayMode(windowDisplayIndex, &displayMode)){
 		return {displayMode.w, displayMode.h};
 	} else return { 800, 600 };
+}
+
+Window::Window(const Window &other) {
+	int x, y;
+	SDL_GetWindowPosition(other.window, &x, &y);
+	int w, h;
+	SDL_GetWindowSize(other.window, &w, &h);
+	window = SDL_CreateWindow(
+			SDL_GetWindowTitle(other.window),
+			x,
+			y,
+			w,
+			h,
+			SDL_GetWindowFlags(other.window)
+	);
+	renderer = SDL_CreateRenderer(
+			window,
+			-1,
+			SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE
+			// | SDL_RENDERER_PRESENTVSYNC // Vsync seems to break the renderer initialization, hence it is commented out
+	);
+	quit_handler_running = true;
+	quit_handler = std::thread([this](){
+		SDL_Event event;
+		while (quit_handler_running){
+			while (SDL_PollEvent(&event)){
+				if (event.type == SDL_QUIT){
+					quit_handler_running = false;
+				}
+				const Uint8* keyboardState = SDL_GetKeyboardState(nullptr);
+				if (keyboardState[SDL_SCANCODE_ESCAPE]){
+					quit_handler_running = false;
+				}
+			}
+		}
+	});
+}
+
+Window &Window::operator=(const Window &other) {
+	if (this == &other){
+		return *this;
+	}
+	
+	join_quit_handler();
+	if (renderer != nullptr) {
+		SDL_DestroyRenderer(renderer);
+	}
+	if (window != nullptr) {
+		SDL_DestroyWindow(window);
+	}
+	
+	int x, y;
+	SDL_GetWindowPosition(other.window, &x, &y);
+	
+	int w, h;
+	SDL_GetWindowSize(other.window, &w, &h);
+	
+	window = SDL_CreateWindow(
+			SDL_GetWindowTitle(other.window),
+			x,
+			y,
+			w,
+			h,
+			SDL_GetWindowFlags(other.window)
+	);
+	renderer = SDL_CreateRenderer(
+			window,
+			-1,
+			SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE
+			// | SDL_RENDERER_PRESENTVSYNC // Vsync seems to break the renderer initialization, hence it is commented out
+	);
+	quit_handler_running = true;
+	quit_handler = std::thread([this](){
+		SDL_Event event;
+		while (quit_handler_running){
+			while (SDL_PollEvent(&event)){
+				if (event.type == SDL_QUIT){
+					quit_handler_running = false;
+				}
+				const Uint8* keyboardState = SDL_GetKeyboardState(nullptr);
+				if (keyboardState[SDL_SCANCODE_ESCAPE]){
+					quit_handler_running = false;
+				}
+			}
+		}
+	});
+	return *this;
+}
+
+Window::Window() {
+	window = nullptr;
+	renderer = nullptr;
+	quit_handler_running = false;
+}
+
+void Window::DrawLine(const Line &line) {
+	DrawLine(line.getP1().first, line.getP1().second, line.getP2().first, line.getP2().second, line.getWidth(), line.getColor());
+}
+
+void Window::Draw(const Screen &screen) {
+	Clear((SDL_Color){0, 0, 0, 255});
+	// This draw method doesn't use absolutePath because I am very consistent (I'm not)
+	Draw((SDL_Rect){0, 0, WindowData::SCREEN_WIDTH, WindowData::SCREEN_HEIGHT}, absolutePath(screen.getBackground()));
+	for (const auto& t : screen.getTexts()){
+		Draw(t);
+	}
 }
