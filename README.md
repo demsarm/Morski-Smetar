@@ -1,5 +1,8 @@
-Navodila:
-                            Igra Izbrisi plastiko
+# Roka me se zmerom boli
+manj moram tolci mizo
+
+# Navodila:
+ ##                           Igra Izbrisi plastiko
 Igro Izbrisi plastiko OBVEZNO "spisete" v programskem jeziku C++  da ne bi bilo pomote
 ROK ODDAJE: 17. 02. 2019
 
@@ -10,7 +13,7 @@ enako velja za zelve, delfine, pingvine in vse ostale zivali. Vsi smo odgovorni 
 Ekologi celega sveta se prizadevajo za planet brez plastike in tudi Vegovci smo se odlocili, da se jim bomo pridruzili  -  vendar ne bomo samo cistili okolje, tudi onesnazevalce bomo unicevali :
 Na morju bomo z ladjo Vegovc pobirali smeti in resevali zivali, na kopnem pa se bomo spopadali z malopridnezi in jih unicevali..  Seveda lahko malopridnezi unicijo tudi nas. Vendar smo mi boljsi
 
-Potek igre:
+## Potek igre:
 Vsaka igra vsebuje 2 ali vec stopenj. Cilj posamezne stopnje je  -  pobrati vse smeti in uniciti barabe.
 
 Na vsaki stopnji je polje sestavljeno iz 1/3 kopna in 2/3 morja.
