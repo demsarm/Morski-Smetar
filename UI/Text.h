@@ -2,12 +2,12 @@
 // Created by martind on 18.2.2024.
 //
 
-#ifndef MORSKI_SMETAR_TEXT_HPP
-#define MORSKI_SMETAR_TEXT_HPP
+#ifndef MORSKI_SMETAR_TEXT_H
+#define MORSKI_SMETAR_TEXT_H
 
 #include <string>
 
-#include "../Entities/GameObject.hpp"
+#include "../Entities/GameObject.h"
 #include "SDL2/SDL_ttf.h"
 
 class Text : public GameObject{
@@ -35,4 +35,4 @@ public:
 };
 
 
-#endif //MORSKI_SMETAR_TEXT_HPP
+#endif //MORSKI_SMETAR_TEXT_H

@@ -1,11 +1,11 @@
-#ifndef MORSKI_SMETAR_ENEMY_HPP
-#define MORSKI_SMETAR_ENEMY_HPP
+#ifndef MORSKI_SMETAR_ENEMY_H
+#define MORSKI_SMETAR_ENEMY_H
 
 
 #include <vector>
-#include "GameObject.hpp"
-#include "Player.hpp"
-#include "Trash.hpp"
+#include "GameObject.h"
+#include "Player.h"
+#include "Trash.h"
 
 class Enemy : public GameObject {
 public:
@@ -53,4 +53,4 @@ public:
 };
 
 
-#endif //MORSKI_SMETAR_ENEMY_HPP
+#endif //MORSKI_SMETAR_ENEMY_H

@@ -1,5 +1,5 @@
-#ifndef MORSKI_SMETAR_CONFIG_HPP
-#define MORSKI_SMETAR_CONFIG_HPP
+#ifndef MORSKI_SMETAR_CONFIG_H
+#define MORSKI_SMETAR_CONFIG_H
 
 // Data about how the game should run
 
@@ -18,4 +18,4 @@ namespace Config{
 	extern int ENEMY_LINK_RANGE;
 }
 
-#endif //MORSKI_SMETAR_CONFIG_HPP
+#endif //MORSKI_SMETAR_CONFIG_H

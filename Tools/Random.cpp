@@ -1,4 +1,4 @@
-#include "Random.hpp"
+#include "Random.h"
 
 using namespace Random;
 

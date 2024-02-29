@@ -2,8 +2,8 @@
 // Created by martind on 26.2.2024.
 //
 
-#ifndef MORSKI_SMETAR_LINE_HPP
-#define MORSKI_SMETAR_LINE_HPP
+#ifndef MORSKI_SMETAR_LINE_H
+#define MORSKI_SMETAR_LINE_H
 
 #include <utility>
 #include <SDL2/SDL.h>
@@ -26,4 +26,4 @@ public:
 };
 
 
-#endif //MORSKI_SMETAR_LINE_HPP
+#endif //MORSKI_SMETAR_LINE_H

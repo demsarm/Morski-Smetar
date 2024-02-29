@@ -1,6 +1,6 @@
 // Description: Path utility functions
 
-#include "Path.hpp"
+#include "Path.h"
 
 #include "filesystem"
 

@@ -1,4 +1,4 @@
-#include "Game.hpp"
+#include "Game.h"
 
 using namespace std;
 
@@ -16,6 +16,8 @@ void Game::Setup() {
 	Window::setWindowSize(800, 600);
 	
 	open = true;
+	
+	window.Raise();
 	
 //	Window test("Test", 100, 100, WindowData::SCREEN_WIDTH, WindowData::SCREEN_HEIGHT, 0);
 //	window = Window("Morski Smetar", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WindowData::SCREEN_WIDTH, WindowData::SCREEN_HEIGHT, 0);
@@ -256,8 +258,6 @@ void Game::Update() {
 	if (enemies.empty() && trash.empty()) { // && friendlies.empty() if you want to be evil and make the player commit several federal crimes and be arrested on 91 criminal charges in order to complete the stage
 		CompleteStage();
 	}
-	
-	
 }
 
 void Game::CompleteStage() {
@@ -477,6 +477,7 @@ void Game::Restart() {
 }
 
 void Game::CheckWindowEvents() {
+	window.checkQuit();
 	if (!window.isRunning()){
 		open = false;
 	}

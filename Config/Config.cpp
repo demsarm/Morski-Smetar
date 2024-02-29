@@ -1,4 +1,4 @@
-#include "Config.hpp"
+#include "Config.h"
 
 // Data about how the game should run
 

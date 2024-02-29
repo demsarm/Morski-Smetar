@@ -1,8 +1,8 @@
-#ifndef MORSKI_SMETAR_FRIENDLY_HPP
-#define MORSKI_SMETAR_FRIENDLY_HPP
+#ifndef MORSKI_SMETAR_FRIENDLY_H
+#define MORSKI_SMETAR_FRIENDLY_H
 
 
-#include "GameObject.hpp"
+#include "GameObject.h"
 
 class Friendly : public GameObject {
 public:
@@ -46,4 +46,4 @@ public:
 };
 
 
-#endif //MORSKI_SMETAR_FRIENDLY_HPP
+#endif //MORSKI_SMETAR_FRIENDLY_H

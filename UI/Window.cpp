@@ -1,4 +1,4 @@
-#include "Window.hpp"
+#include "Window.h"
 
 #include <cmath>
 
@@ -57,21 +57,7 @@ Window::Window(const char *title, int x, int y, int w, int h, Uint32 flags) {
 			// | SDL_RENDERER_PRESENTVSYNC // Vsync seems to break the renderer initialization, hence it is commented out
 	);
 	
-	quit_handler_running = true;
-	quit_handler = std::thread([this](){
-		SDL_Event event;
-		while (quit_handler_running){
-			while (SDL_PollEvent(&event)){
-				if (event.type == SDL_QUIT){
-					quit_handler_running = false;
-				}
-				const Uint8* keyboardState = SDL_GetKeyboardState(nullptr);
-				if (keyboardState[SDL_SCANCODE_ESCAPE]){
-					quit_handler_running = false;
-				}
-			}
-		}
-	});
+	running = true;
 }
 
 /**
@@ -79,7 +65,6 @@ Window::Window(const char *title, int x, int y, int w, int h, Uint32 flags) {
  * Joins the quit handler thread
  */
 Window::~Window() {
-	join_quit_handler();
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 //	SDL_Quit();
@@ -156,17 +141,7 @@ void Window::Clear(SDL_Color col){
  * @return Whether the window is running
  */
 bool Window::isRunning() const{
-	return quit_handler_running;
-}
-
-/**
- * @brief Joins the quit handler thread
- */
-void Window::join_quit_handler(){
-	if (quit_handler.joinable()) {
-		quit_handler_running = false;
-		quit_handler.join();
-	}
+	return running;
 }
 
 /**
@@ -377,35 +352,20 @@ Window::Window(const Window &other) {
 			SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE
 			// | SDL_RENDERER_PRESENTVSYNC // Vsync seems to break the renderer initialization, hence it is commented out
 	);
-	quit_handler_running = true;
-	quit_handler = std::thread([this](){
-		SDL_Event event;
-		while (quit_handler_running){
-			while (SDL_PollEvent(&event)){
-				if (event.type == SDL_QUIT){
-					quit_handler_running = false;
-				}
-				const Uint8* keyboardState = SDL_GetKeyboardState(nullptr);
-				if (keyboardState[SDL_SCANCODE_ESCAPE]){
-					quit_handler_running = false;
-				}
-			}
-		}
-	});
+	running = true;
 }
 
 Window &Window::operator=(const Window &other) {
 	if (this == &other){
 		return *this;
 	}
-	
-	join_quit_handler();
 	if (renderer != nullptr) {
 		SDL_DestroyRenderer(renderer);
 	}
 	if (window != nullptr) {
 		SDL_DestroyWindow(window);
 	}
+	
 	
 	int x, y;
 	SDL_GetWindowPosition(other.window, &x, &y);
@@ -427,28 +387,14 @@ Window &Window::operator=(const Window &other) {
 			SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE
 			// | SDL_RENDERER_PRESENTVSYNC // Vsync seems to break the renderer initialization, hence it is commented out
 	);
-	quit_handler_running = true;
-	quit_handler = std::thread([this](){
-		SDL_Event event;
-		while (quit_handler_running){
-			while (SDL_PollEvent(&event)){
-				if (event.type == SDL_QUIT){
-					quit_handler_running = false;
-				}
-				const Uint8* keyboardState = SDL_GetKeyboardState(nullptr);
-				if (keyboardState[SDL_SCANCODE_ESCAPE]){
-					quit_handler_running = false;
-				}
-			}
-		}
-	});
+	
 	return *this;
 }
 
 Window::Window() {
 	window = nullptr;
 	renderer = nullptr;
-	quit_handler_running = false;
+	running = false;
 }
 
 void Window::DrawLine(const Line &line) {
@@ -461,5 +407,18 @@ void Window::Draw(const Screen &screen) {
 	Draw((SDL_Rect){0, 0, WindowData::SCREEN_WIDTH, WindowData::SCREEN_HEIGHT}, absolutePath(screen.getBackground()));
 	for (const auto& t : screen.getTexts()){
 		Draw(t);
+	}
+}
+
+void Window::checkQuit() {
+	SDL_Event event;
+	while (SDL_PollEvent(&event)){
+		if (event.type == SDL_QUIT){
+			running = false;
+		}
+		const Uint8* keyboardState = SDL_GetKeyboardState(nullptr);
+		if (keyboardState[SDL_SCANCODE_ESCAPE]){
+			running = false;
+		}
 	}
 }

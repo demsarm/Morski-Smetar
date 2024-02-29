@@ -1,5 +1,5 @@
 #include <valarray> // Apparently contains pow
-#include "Math.hpp"
+#include "Math.h"
 #include <cassert>
 /**
  * @brief Returns the minimum of two values
@@ -55,7 +55,7 @@ std::pair<int, int> line_circle_intersection(int x1, int y1, int x2, int y2, int
 	return {(int) (x1 + (x2 - x1) * t), (int) (y1 + (y2 - y1) * t)};
 }
 
- // Code that doesn't work but at least I understand it better
+ // Code from ye olden days that doesn't work, but I'm keeping it for posterity
 /*
  std::pair<int, int> line_circle_intersection(int x1, int y1, int x2, int y2, int cx, int cy, int r) {
 	double k = (double) (y2 - y1) / (x2 - x1);

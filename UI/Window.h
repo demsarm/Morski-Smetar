@@ -9,12 +9,12 @@
 #include "string"
 #include "thread"
 
-#include "../Entities/GameObject.hpp"
-#include "../Tools/Path.hpp"
-#include "../Config/Config.hpp"
-#include "Text.hpp"
-#include "Line.hpp"
-#include "Screen.hpp"
+#include "../Entities/GameObject.h"
+#include "../Tools/Path.h"
+#include "../Config/Config.h"
+#include "Text.h"
+#include "Line.h"
+#include "Screen.h"
 
 [[maybe_unused]] std::pair<int, int> getScreenSize();
 
@@ -22,11 +22,9 @@ class Window {
 	SDL_Window *window;
 	SDL_Renderer *renderer;
 	
-	bool quit_handler_running;
-	std::thread quit_handler;
+	bool running;
 public:
 	static void init();
-	
 	
 	[[maybe_unused]] static void setWindowSize(int percent);
 	static void setWindowSize(int w, int h);
@@ -59,7 +57,6 @@ public:
 	std::pair<int, int> getScreenSize();
 	
 	[[nodiscard]] bool isRunning() const;
-	void join_quit_handler();
 	
 	Window& operator=(const Window& other);
 	
@@ -67,6 +64,7 @@ public:
 	[[nodiscard]] [[maybe_unused]] SDL_Window *getWindow() const;
 	
 	void centerWindow();
+	void checkQuit();
 };
 
 #endif //SDL_GAME_WINDOW_HPP

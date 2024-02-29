@@ -1,7 +1,7 @@
 #ifndef SDL_GAME_PLAYER_HPP
 #define SDL_GAME_PLAYER_HPP
 
-#include "GameObject.hpp"
+#include "GameObject.h"
 
 #include <thread>
 

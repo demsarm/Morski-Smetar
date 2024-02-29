@@ -1,34 +1,19 @@
-#define SDL_MAIN_HANDLED
+//#define SDL_MAIN_HANDLED // Apparently needed for mingw to work
 
 #include "SDL2/SDL.h"
 
-#include <vector>
+#include "Config/Data.h"
 
-#include "UI/Window.hpp"
-
-#include "Tools/Random.hpp"
-#include "Tools/Collision.hpp"
-#include "Tools/Overloads.hpp"
-#include "Tools/Math.hpp"
-
-#include "Entities/GameObject.hpp"
-#include "Entities/Player.hpp"
-#include "Entities/Wave.hpp"
-#include "Entities/Trash.hpp"
-#include "UI/Text.hpp"
-
-#include "Config/Config.hpp"
-#include "Config/Data.hpp"
-#include "Entities/Enemy.hpp"
-#include "Entities/Friendly.hpp"
-
-#include "Game.hpp"
+#include "Game.h"
 
 using namespace std;
 
-
+#ifdef _WIN32
+int WinMain() {
+#else
 int main() {
-	SDL_SetMainReady(); // If there are problems, try removing this line to see if anything's changed. It lets SDL functions know the initialization went well.
+#endif
+//	SDL_SetMainReady(); // If there are problems, try removing this line to see if anything's changed. It lets SDL functions wknow the initialization went well.
 	
 	// Because the SDL documentation is godawful and doesn't list the values of the SDL_Event types, I'm going to do it here.
 	/*

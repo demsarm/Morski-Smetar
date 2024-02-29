@@ -1,31 +1,31 @@
 // Credit where credit is due - I got the idea from gagaboom1 (aka. Gašper Horvatić)
 // The code is mine though - the code is mainly just what was in main() before - I just moved it to a class to make it cleaner
 
-#ifndef MORSKI_SMETAR_GAME_HPP
-#define MORSKI_SMETAR_GAME_HPP
+#ifndef MORSKI_SMETAR_GAME_H
+#define MORSKI_SMETAR_GAME_H
 
 #include "SDL2/SDL.h"
 
 #include <vector>
 
-#include "UI/Window.hpp"
+#include "UI/Window.h"
 
-#include "Tools/Random.hpp"
-#include "Tools/Collision.hpp"
-#include "Tools/Overloads.hpp"
-#include "Tools/Math.hpp"
+#include "Tools/Random.h"
+#include "Tools/Collision.h"
+#include "Tools/Overloads.h"
+#include "Tools/Math.h"
 
-#include "Entities/GameObject.hpp"
-#include "Entities/Player.hpp"
-#include "Entities/Wave.hpp"
-#include "Entities/Trash.hpp"
-#include "UI/Text.hpp"
+#include "Entities/GameObject.h"
+#include "Entities/Player.h"
+#include "Entities/Wave.h"
+#include "Entities/Trash.h"
+#include "UI/Text.h"
 
-#include "Config/Config.hpp"
-#include "Config/Data.hpp"
-#include "Entities/Enemy.hpp"
-#include "Entities/Friendly.hpp"
-#include "UI/Line.hpp"
+#include "Config/Config.h"
+#include "Config/Data.h"
+#include "Entities/Enemy.h"
+#include "Entities/Friendly.h"
+#include "UI/Line.h"
 
 class Game {
 	Window window = Window("Morski Smetar", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WindowData::SCREEN_WIDTH, WindowData::SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
@@ -57,4 +57,4 @@ public:
 };
 
 
-#endif //MORSKI_SMETAR_GAME_HPP
+#endif //MORSKI_SMETAR_GAME_H

@@ -1,8 +1,8 @@
-#include "Player.hpp"
+#include "Player.h"
 
-#include "../Config/Config.hpp"
-#include "../Tools/Collision.hpp"
-#include "../Tools/Overloads.hpp"
+#include "../Config/Config.h"
+#include "../Tools/Collision.h"
+#include "../Tools/Overloads.h"
 /**
  * Default constructor for the Player class.
  * Initializes the input handler thread which continuously checks for keyboard events.

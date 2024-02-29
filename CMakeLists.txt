@@ -11,41 +11,41 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_executable(Morski_Smetar main.cpp
         Config/Config.cpp
-        Config/Config.hpp
+        Config/Config.h
         UI/Window.cpp
-        UI/Window.hpp
+        UI/Window.h
         Entities/GameObject.cpp
-        Entities/GameObject.hpp
+        Entities/GameObject.h
         Entities/Player.cpp
-        Entities/Player.hpp
+        Entities/Player.h
         Tools/Path.cpp
-        Tools/Path.hpp
+        Tools/Path.h
         Entities/Wave.cpp
-        Entities/Wave.hpp
+        Entities/Wave.h
         Tools/Random.cpp
-        Tools/Random.hpp
+        Tools/Random.h
         Entities/Trash.cpp
-        Entities/Trash.hpp
+        Entities/Trash.h
         Tools/Collision.cpp
-        Tools/Collision.hpp
+        Tools/Collision.h
         Config/Data.cpp
-        Config/Data.hpp
+        Config/Data.h
         UI/Text.cpp
-        UI/Text.hpp
+        UI/Text.h
         Tools/Overloads.cpp
-        Tools/Overloads.hpp
+        Tools/Overloads.h
         Entities/Enemy.cpp
-        Entities/Enemy.hpp
+        Entities/Enemy.h
         Tools/Math.cpp
-        Tools/Math.hpp
+        Tools/Math.h
         Entities/Friendly.cpp
-        Entities/Friendly.hpp
+        Entities/Friendly.h
         Game.cpp
-        Game.hpp
+        Game.h
         UI/Line.cpp
-        UI/Line.hpp
+        UI/Line.h
         UI/Screen.cpp
-        UI/Screen.hpp
+        UI/Screen.h
 )
 
 target_link_libraries(Morski_Smetar SDL2)

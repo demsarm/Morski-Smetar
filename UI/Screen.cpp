@@ -2,7 +2,7 @@
 // Created by martind on 26.2.2024.
 //
 
-#include "Screen.hpp"
+#include "Screen.h"
 
 Screen::Screen(const std::string &background) {
 	this->background = background;

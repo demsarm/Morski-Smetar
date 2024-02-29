@@ -2,13 +2,13 @@
 // Created by martind on 26.2.2024.
 //
 
-#ifndef MORSKI_SMETAR_SCREEN_HPP
-#define MORSKI_SMETAR_SCREEN_HPP
+#ifndef MORSKI_SMETAR_SCREEN_H
+#define MORSKI_SMETAR_SCREEN_H
 
 
 #include <string>
 #include <vector>
-#include "Text.hpp"
+#include "Text.h"
 
 class Screen {
 	std::string background;
@@ -28,4 +28,4 @@ public:
 };
 
 
-#endif //MORSKI_SMETAR_SCREEN_HPP
+#endif //MORSKI_SMETAR_SCREEN_H

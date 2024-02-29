@@ -1,7 +1,7 @@
-#include "Trash.hpp"
+#include "Trash.h"
 
-#include "../Tools/Random.hpp"
-#include "../Config/Config.hpp"
+#include "../Tools/Random.h"
+#include "../Config/Config.h"
 
 /**
  * @brief Default constructor for the Trash class

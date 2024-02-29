@@ -2,12 +2,12 @@
 // Created by martind on 18.2.2024.
 //
 
-#ifndef MORSKI_SMETAR_TRASH_HPP
-#define MORSKI_SMETAR_TRASH_HPP
+#ifndef MORSKI_SMETAR_TRASH_H
+#define MORSKI_SMETAR_TRASH_H
 
 #include <string>
 
-#include "GameObject.hpp"
+#include "GameObject.h"
 
 class Trash : public GameObject {
 	inline static const std::string trash_types[] = {
@@ -32,4 +32,4 @@ public:
 };
 
 
-#endif //MORSKI_SMETAR_TRASH_HPP
+#endif //MORSKI_SMETAR_TRASH_H

@@ -1,4 +1,4 @@
-#include "Text.hpp"
+#include "Text.h"
 
 // It's just a bunch of getter and setters - I'm not wasting my time adding docstrings to this
 

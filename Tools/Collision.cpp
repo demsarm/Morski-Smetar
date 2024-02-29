@@ -1,4 +1,4 @@
-#include "Collision.hpp"
+#include "Collision.h"
 
 /*
  * @brief Checks if two rectangles are colliding

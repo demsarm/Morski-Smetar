@@ -2,9 +2,9 @@
 // Created by martind on 20.2.2024.
 //
 
-#include "Friendly.hpp"
-#include "../Config/Config.hpp"
-#include "../Tools/Random.hpp"
+#include "Friendly.h"
+#include "../Config/Config.h"
+#include "../Tools/Random.h"
 
 SDL_Color Friendly::sonar_color = {255, 255, 255, 255};
 

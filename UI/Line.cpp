@@ -2,7 +2,7 @@
 // Created by martind on 26.2.2024.
 //
 
-#include "Line.hpp"
+#include "Line.h"
 
 Line::Line(int x1, int y1, int x2, int y2, SDL_Color color, int width) {
 	p1 = {x1, y1};

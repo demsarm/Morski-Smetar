@@ -2,10 +2,10 @@
 // Created by martind on 18.2.2024.
 //
 
-#ifndef MORSKI_SMETAR_WAVE_HPP
-#define MORSKI_SMETAR_WAVE_HPP
+#ifndef MORSKI_SMETAR_WAVE_H
+#define MORSKI_SMETAR_WAVE_H
 
-#include "GameObject.hpp"
+#include "GameObject.h"
 
 class Wave : public GameObject {
 public:
@@ -19,4 +19,4 @@ public:
 };
 
 
-#endif //MORSKI_SMETAR_WAVE_HPP
+#endif //MORSKI_SMETAR_WAVE_H

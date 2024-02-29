@@ -2,11 +2,11 @@
 // Created by martind on 19.2.2024.
 //
 
-#include "Enemy.hpp"
+#include "Enemy.h"
 
-#include "../Tools/Random.hpp"
-#include "../Config/Config.hpp"
-#include "../Tools/Overloads.hpp"
+#include "../Tools/Random.h"
+#include "../Config/Config.h"
+#include "../Tools/Overloads.h"
 
 std::vector<Enemy> * Enemy::enemies = nullptr;
 std::vector<Trash> * Enemy::trashes = nullptr;

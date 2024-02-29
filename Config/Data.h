@@ -1,5 +1,5 @@
-#ifndef MORSKI_SMETAR_DATA_HPP
-#define MORSKI_SMETAR_DATA_HPP
+#ifndef MORSKI_SMETAR_DATA_H
+#define MORSKI_SMETAR_DATA_H
 
 // Data used during the game
 
@@ -11,4 +11,4 @@ namespace Data {
 	extern bool isAlive;
 }
 
-#endif //MORSKI_SMETAR_DATA_HPP
+#endif //MORSKI_SMETAR_DATA_H

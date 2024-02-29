@@ -1,7 +1,7 @@
-#include "Wave.hpp"
+#include "Wave.h"
 
-#include "../Tools/Random.hpp"
-#include "../Config/Config.hpp"
+#include "../Tools/Random.h"
+#include "../Config/Config.h"
 Wave::Wave() = default;
 Wave::Wave(int x, int y) {
 	rect = {x, y, 50, 160};
