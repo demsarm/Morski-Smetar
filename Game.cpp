@@ -117,39 +117,29 @@ void Game::Update() {
 				warnings.push_back(warn); // Clang-Tidy: Use emplace_back instead of push_back (iont feel like it)
 			}
 			
-			// Draw a line to enemies in range
-			if (other != enemies[i] && distance(player, enemies[i]) < (double) Config::PLAYER_SIGHT_RANGE) {
-				if (distance(enemies[i], other) < (double) Config::PLAYER_SIGHT_RANGE) {
-					Line l(enemies[i].getRect().x + enemies[i].getRect().w / 2,
-					       enemies[i].getRect().y + enemies[i].getRect().h / 2,
-					       other.getRect().x + other.getRect().w / 2,
-					       other.getRect().y + other.getRect().h / 2,
-						   (SDL_Color) {255, 0, 0, 255},
-						   3
-					);
-					lines.push_back(l); // Clang-Tidy: Use emplace_back instead of push_back (iont feel like it)
-				}
-				// TODO fix this - the new version of line_circle_intersection is better (hopefully)
-				/*
-				else {
-					std::pair<int, int> inter = line_circle_intersection(enemies[i].getRect().x + enemies[i].getRect().w / 2,
-					                                                    enemies[i].getRect().y + enemies[i].getRect().h / 2,
-					                                                    other.getRect().x + other.getRect().w / 2,
-					                                                    other.getRect().y + other.getRect().h / 2,
-					                                                    player.getRect().x + player.getRect().w / 2,
-					                                                    player.getRect().y + player.getRect().h / 2,
-					                                                    Config::PLAYER_SIGHT_RANGE);
+			if (other != enemies[i] && distance(player, enemies[i]) < Config::PLAYER_SIGHT_RANGE) {
+				if (distance(player, other) < Config::PLAYER_SIGHT_RANGE) {
+					lines.push_back(Line({enemies[i].getRect().x + enemies[i].getRect().w / 2,
+					                      enemies[i].getRect().y + enemies[i].getRect().h / 2},
+										  {other.getRect().x + other.getRect().w / 2,
+										   other.getRect().y + other.getRect().h / 2},
+										  (SDL_Color) {255, 0, 0, 255}, 3));
+				} else {
+					/*
+					std::pair <int, int> inter = line_circle_intersection(enemies[i].getRect().x + enemies[i].getRect().w / 2,
+					                                                      enemies[i].getRect().y + enemies[i].getRect().h / 2,
+					                                                      other.getRect().x + other.getRect().w / 2,
+					                                                      other.getRect().y + other.getRect().h / 2,
+					                                                      player.getRect().x + player.getRect().w / 2,
+					                                                      player.getRect().y + player.getRect().h / 2,
+					                                                       Config::PLAYER_SIGHT_RANGE);
 					if (inter.first != -1 && inter.second != -1) {
-						Line l(
-								{enemies[i].getRect().x + enemies[i].getRect().w / 2,
-								 enemies[i].getRect().y + enemies[i].getRect().h / 2},
-								inter,
-								(SDL_Color) {255, 0, 0, 255},
-								3
-						);
-						lines.push_back(l); // Clang-Tidy: Use emplace_back instead of push_back (iont feel like it)
-					}
-				}*/
+						lines.push_back(Line({enemies[i].getRect().x + enemies[i].getRect().w / 2,
+						                      enemies[i].getRect().y + enemies[i].getRect().h / 2},
+						                     {inter.first, inter.second},
+						                     (SDL_Color) {255, 0, 0, 255}, 3));
+					}*/
+				}
 			}
 		}
 		
