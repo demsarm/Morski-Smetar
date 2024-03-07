@@ -14,4 +14,10 @@
  */
 std::string absolutePath(const std::string& relativePath);
 
+/**
+ * @brief What the name says
+ * @return The directory the program is running in
+*/
+std::string getWorkingDir();
+
 #endif //SDL_GAME_PATH_HPP

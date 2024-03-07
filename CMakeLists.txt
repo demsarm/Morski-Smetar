@@ -18,8 +18,8 @@ add_executable(Morski_Smetar main.cpp
         Entities/GameObject.h
         Entities/Player.cpp
         Entities/Player.h
-        Tools/Path.cpp
-        Tools/Path.h
+        Tools/filesystem.cpp
+        Tools/filesystem.h
         Entities/Wave.cpp
         Entities/Wave.h
         Tools/Random.cpp
@@ -46,6 +46,10 @@ add_executable(Morski_Smetar main.cpp
         UI/Line.h
         UI/Screen.cpp
         UI/Screen.h
+        Tools/File.cpp
+        Tools/File.h
+        Tools/SHA256.cpp
+        Tools/SHA256.h
 )
 
 target_link_libraries(Morski_Smetar SDL2)

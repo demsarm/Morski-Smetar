@@ -1,6 +1,6 @@
 // Description: Path utility functions
 
-#include "Path.h"
+#include "filesystem.h"
 
 #include "filesystem"
 
@@ -13,4 +13,12 @@ std::string absolutePath(const std::string& relativePath){
 	const std::string &output =
 			std::filesystem::current_path().parent_path().string() + "/" + relativePath;
 	return output;
+}
+
+/**
+ * @brief What the name says
+ * @return The directory the program is running in
+*/
+std::string getWorkingDir(){
+	return std::filesystem::current_path().string();
 }
