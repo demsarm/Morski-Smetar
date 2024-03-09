@@ -50,6 +50,8 @@ add_executable(Morski_Smetar main.cpp
         Tools/File.h
         Tools/SHA256.cpp
         Tools/SHA256.h
+        UI/Input.cpp
+        UI/Input.h
 )
 
 target_link_libraries(Morski_Smetar SDL2)

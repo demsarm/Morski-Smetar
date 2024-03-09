@@ -3,6 +3,8 @@
 #include "../Config/Config.h"
 #include "../Tools/Collision.h"
 #include "../Tools/Overloads.h"
+#include "../UI/Input.h"
+
 /**
  * Default constructor for the Player class.
  * Initializes the input handler thread which continuously checks for keyboard events.
@@ -75,18 +77,17 @@ Player &Player::operator=(const Player &other) {
  * After a switch, the switch delay is set to 300.
  */
 void Player::Update() {
-	const Uint8 *kbd_state = SDL_GetKeyboardState(nullptr);
-	if (kbd_state[SDL_SCANCODE_W]) {
+	if (Input::getKey("W")) {
 		if (rect.y > 0) {
 			move(0, -speed);
 		}
 	}
-	if (kbd_state[SDL_SCANCODE_S]) {
+	if (Input::getKey("S")) {
 		if (rect.y < WindowData::SCREEN_HEIGHT - rect.h) {
 			move(0, speed);
 		}
 	}
-	if (kbd_state[SDL_SCANCODE_A]) {
+	if (Input::getKey("A")) {
 		facing_right = false;
 		if (rect.x > WindowData::SCREEN_WIDTH / 3 + 10 && state == EMBARKED) { // The + 10 is there for some wiggle room
 			move(-speed, 0);
@@ -96,7 +97,7 @@ void Player::Update() {
 		}
 		
 	}
-	if (kbd_state[SDL_SCANCODE_D]) {
+	if (Input::getKey("D")) {
 		facing_right = true;
 		if (rect.x < WindowData::SCREEN_WIDTH - rect.w && state == EMBARKED) {
 			move(speed, 0);
@@ -104,11 +105,10 @@ void Player::Update() {
 		if (rect.x < WindowData::SCREEN_WIDTH / 3 - rect.w - 10 && state == DISEMBARKED) {
 			move(speed, 0);
 		}
-		
 	}
 	
 	if (isColliding(getRect(), (SDL_Rect){WindowData::SCREEN_WIDTH / 3, 0, WindowData::SCREEN_WIDTH / 6, WindowData::SCREEN_HEIGHT})) {
-		if (kbd_state[SDL_SCANCODE_E] && switch_delay <= 0) {
+		if (Input::getKey("E") && switch_delay <= 0) {
 			state = DISEMBARKED;
 			boat_position = getRect();
 			setRect({WindowData::SCREEN_WIDTH/3 - (getRect().x - WindowData::SCREEN_WIDTH/3 + 80), getRect().y, 80, 115});
@@ -117,23 +117,22 @@ void Player::Update() {
 		}
 	}
 	if (isColliding(getRect() + (SDL_Rect){getRect().w, 0, 0, 0},
-					{boat_position.x - WindowData::SCREEN_WIDTH/8,
-					    boat_position.y - 50,
-						boat_position.w + WindowData::SCREEN_WIDTH/4,
-						boat_position.h + 100})) {
-		if (kbd_state[SDL_SCANCODE_E] && switch_delay <= 0) {
+	                {boat_position.x - WindowData::SCREEN_WIDTH/8,
+	                 boat_position.y - 50,
+	                 boat_position.w + WindowData::SCREEN_WIDTH/4,
+	                 boat_position.h + 100})) {
+		if (Input::getKey("E") && switch_delay <= 0) {
 			state = EMBARKED;
 			setRect(boat_position);
 			boat_position = {0, 0, 0, 0};
 			setPath("Assets/Boat.png");
 			switch_delay = 300;
 		}
-	
+		
 	}
 	if (switch_delay > 0) {
 		--switch_delay;
 	}
-	
 }
 
 /**
