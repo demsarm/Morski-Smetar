@@ -19,6 +19,8 @@ void Game::Setup() {
 	
 	open = true;
 	
+	generateMainMenu();
+	
 	window.Raise();
 	
 //	Window test("Test", 100, 100, WindowData::SCREEN_WIDTH, WindowData::SCREEN_HEIGHT, 0);
@@ -70,7 +72,7 @@ void Game::Setup() {
 	
 }
 
-void Game::Update() {
+void Game::PlayingUpdate() {
 	lines.clear();
 	warnings.clear();
 	
@@ -162,29 +164,42 @@ void Game::Update() {
 				              (int64_t) i); // Yes that is how I cast to long I may or may not be chronically deranged
 				Data::score += 2;
 			} else {
-				Data::isAlive = false;
+				Data::gameState = Data::GameState::GAME_OVER;
 				// Create the game over screen - it's not done in Setup() because WindowData::SCREEN_WIDTH and WindowData::SCREEN_HEIGHT are changed during gameplay
 				gameOverScreen.setBackground("Assets/Game.png");
 				Text gameOverText("Game Over", "Assets/Fonts/VCR_OSD_MONO.ttf", 100, (SDL_Color) {255, 0, 0, 255});
-				Text scoreText("Score: " + std::to_string(Data::score), "Assets/Fonts/VCR_OSD_MONO.ttf", 30, (SDL_Color) {0x88, 0x88, 0x88, 255});
+				Text scoreText("Score: " + std::to_string(Data::score), "Assets/Fonts/VCR_OSD_MONO.ttf", 30, (SDL_Color) {0xff, 0x40, 0x40, 255});
 				int scoreLen = 18 * (int)scoreText.getText().length();
 				gameOverText.setRect({WindowData::SCREEN_WIDTH / 2 - 300, WindowData::SCREEN_HEIGHT / 2 - 50, 600, 100});
-				scoreText.setRect({WindowData::SCREEN_WIDTH / 2 - scoreLen/2, WindowData::SCREEN_HEIGHT / 2 + 100, scoreLen, 45}); // scoreLen has to be a variable because blah blah blah initializer list blah blah blah non-constant value blah blah blah
+				scoreText.setRect({WindowData::SCREEN_WIDTH / 2 - scoreLen/2, WindowData::SCREEN_HEIGHT / 2 + 50, scoreLen, 30}); // scoreLen has to be a variable because blah blah blah initializer list blah blah blah non-constant value blah blah blah
 				gameOverScreen.clearTexts();
+				gameOverScreen.clearButtons();
 				gameOverScreen.addText(gameOverText);
 				gameOverScreen.addText(scoreText);
 				
-				Text buttonText("Restart", "Assets/Fonts/VCR_OSD_MONO.ttf", 30, (SDL_Color) {0x88, 0x88, 0x88, 255});
-				buttonText.setRect({WindowData::SCREEN_WIDTH / 2 - 70, WindowData::SCREEN_HEIGHT / 2 + 50, 140, 30});
-				Button restartButton((SDL_Rect){WindowData::SCREEN_WIDTH / 2 - 180, WindowData::SCREEN_HEIGHT / 2 + 50, 360, 30},
-							buttonText,
-							(SDL_Color){0, 0, 0, 0},
-							(SDL_Color){0, 0, 0, 0},
-							(SDL_Color){0, 0, 0, 0},
-							[this](){this->Restart();}
+				Text restartText("Restart", "Assets/Fonts/VCR_OSD_MONO.ttf", 30, (SDL_Color) {0x88, 0x88, 0x88, 255});
+				restartText.setRect({WindowData::SCREEN_WIDTH / 2 - 70, WindowData::SCREEN_HEIGHT / 2 + 100, 140, 30});
+				Button restartButton((SDL_Rect){WindowData::SCREEN_WIDTH / 2 - 180, WindowData::SCREEN_HEIGHT / 2 + 100, 360, 30},
+				                     restartText,
+				                     "Assets/Empty.png",
+				                     "Assets/Empty.png",
+				                     "Assets/Empty.png",
+				                     [this](){this->Restart();}
 				);
 				
+				Text menuText("Main Menu", "Assets/Fonts/VCR_OSD_MONO.ttf", 30, (SDL_Color) {0x88, 0x88, 0x88, 255});
+				menuText.setRect({WindowData::SCREEN_WIDTH / 2 - 70, WindowData::SCREEN_HEIGHT / 2 + 150, 180, 30});
+				Button menuButton((SDL_Rect){WindowData::SCREEN_WIDTH / 2 - 90, WindowData::SCREEN_HEIGHT / 2 + 150, 180, 30},
+				                   menuText,
+				                   "Assets/Empty.png",
+				                   "Assets/Empty.png",
+				                   "Assets/Empty.png",
+				                   [](){Data::gameState = Data::GameState::MAIN_MENU;}
+				);
+				
+				
 				gameOverScreen.addButton(restartButton);
+				gameOverScreen.addButton(menuButton);
 				// Some math to make the text look not squished
 				// Game Over - 9 letters
 				// Press R to restart - 18 letters
@@ -193,6 +208,8 @@ void Game::Update() {
 				// lower the font size to 30 - both w and h would fall to 30% - 360 * 30, I believe
 			
 				// Note to self in the future: If you plan to change the text in the future, make sure to keep the 2:3 ratio
+				
+				// Another note at a later date: Apparently the standard ratio for monospace fonts is 1:2, not 2:3
 			}
 		}
 		
@@ -342,101 +359,108 @@ void Game::CompleteStage() {
 }
 
 void Game::Render(){
-	if(Data::isAlive) {
-		// Clear the window
-		window.Clear((SDL_Color) {50, 210, 255, 255});
-		
-		// Draw the waves
-		for (auto &wave: waves) {
-			window.Draw(wave);
-		}
-		
-		// Let there be land (again)
-		window.Draw(land);
-		
-		// Draw the trash
-		for (auto &t: trash) {
-			window.Draw(t);
-		}
-		
-		// Draw the enemies
-		for (auto &e: enemies) {
-			bool draw = distance(player, e) < Config::PLAYER_SIGHT_RANGE;
-			for (auto &f: friendlies) {
-				if (distance(f, e) < Config::ALLY_SIGHT_RANGE &&
-				    f.getType() == Friendly::Type::LAND) { // Make "sight sharing" exclusive to land friendlies
-					draw = true;
+	switch (Data::gameState) {
+		case Data::GameState::PLAYING:
+			// Clear the window
+			window.Clear((SDL_Color) {50, 210, 255, 255});
+			
+			// Draw the waves
+			for (auto &wave: waves) {
+				window.Draw(wave);
+			}
+			
+			// Let there be land (again)
+			window.Draw(land);
+			
+			// Draw the trash
+			for (auto &t: trash) {
+				window.Draw(t);
+			}
+			
+			// Draw the enemies
+			for (auto &e: enemies) {
+				bool draw = distance(player, e) < Config::PLAYER_SIGHT_RANGE;
+				for (auto &f: friendlies) {
+					if (distance(f, e) < Config::ALLY_SIGHT_RANGE &&
+					    f.getType() == Friendly::Type::LAND) { // Make "sight sharing" exclusive to land friendlies
+						draw = true;
+					}
+					if (draw) {
+						// Would be put in the if statement above, but that would
+						//  1. make the code less readable and
+						//  2. result in the code going through the whole loop (in the worst case) even if the enemy is in sight of the player
+						break;
+					}
 				}
 				if (draw) {
-					// Would be put in the if statement above, but that would
-					//  1. make the code less readable and
-					//  2. result in the code going through the whole loop (in the worst case) even if the enemy is in sight of the player
-					break;
+					window.Draw(e);
 				}
 			}
-			if (draw) {
-				window.Draw(e);
+			
+			// Draw the friendlies
+			for (auto &f: friendlies) {
+				window.Draw(f, 0.0,
+				            f.getDirection() == Friendly::Direction::NEGATIVE ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL);
+				if (f.getType() == Friendly::Type::LAND) {
+					window.DrawCircle(f.getRect().x + f.getRect().w / 2,
+					                  f.getRect().y + f.getRect().h / 2,
+					                  Data::friendly_sonar, 10, Friendly::getSonarColor(), 32);
+					window.DrawCircle(f.getRect().x + f.getRect().w / 2,
+					                  f.getRect().y + f.getRect().h / 2,
+					                  Config::ALLY_SIGHT_RANGE, 10, Friendly::getSonarColor(), 32);
+				}
 			}
-		}
-		
-		// Draw the friendlies
-		for (auto &f: friendlies) {
-			window.Draw(f, 0.0,
-			            f.getDirection() == Friendly::Direction::NEGATIVE ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL);
-			if (f.getType() == Friendly::Type::LAND) {
-				window.DrawCircle(f.getRect().x + f.getRect().w / 2,
-				                  f.getRect().y + f.getRect().h / 2,
-				                  Data::friendly_sonar, 10, Friendly::getSonarColor(), 32);
-				window.DrawCircle(f.getRect().x + f.getRect().w / 2,
-				                  f.getRect().y + f.getRect().h / 2,
-				                  Config::ALLY_SIGHT_RANGE, 10, Friendly::getSonarColor(), 32);
+			
+			++Data::friendly_sonar;
+			if (Data::friendly_sonar > Config::ALLY_SIGHT_RANGE) {
+				Data::friendly_sonar = 0;
 			}
-		}
-		
-		++Data::friendly_sonar;
-		if (Data::friendly_sonar > Config::ALLY_SIGHT_RANGE) {
-			Data::friendly_sonar = 0;
-		}
-		
-		// Draw the player and his 'sonar'
-		window.DrawCircle(player.getRect().x + player.getRect().w / 2, player.getRect().y + player.getRect().h / 2,
-		                  Config::PLAYER_SIGHT_RANGE, 10, player.getSonarColor(), 32);
-		window.DrawCircle(player.getRect().x + player.getRect().w / 2, player.getRect().y + player.getRect().h / 2,
-		                  Data::sonar, 10, player.getSonarColor(), 32);
-		window.Draw(player, 0.0, player.isFacingLeft() ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL);
-		
-		// Move the player's "inner sonar"
-		++Data::sonar;
-		if (Data::sonar > Config::PLAYER_SIGHT_RANGE) {
-			Data::sonar = 0;
-		}
-		
-		// Draw the boat if the player isn't on it
-		if (player.getBoatPosition() != (SDL_Rect) {0, 0, 0, 0}) {
-			GameObject boat;
-			boat.setPath("Assets/Boat.png");
-			boat.setRect(player.getBoatPosition());
-			window.Draw(boat);
-		}
-		
-		// Draw the score
-		for (auto &t: texts) {
-			window.Draw(t);
-		}
-		
-		for (auto &l: lines) {
-			window.DrawLine(l);
-		}
-		
-		for (auto &w: warnings) {
-			window.Draw(w);
-		}
-		if (disembark_indicator != nullptr) {
-			window.Draw(*disembark_indicator, 0.0, player.isFacingRight() ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL);
-		}
-	} else {
-		gameOverScreen.Update(); // TODO: This would be better if it were in the Game::Update() method
-		window.Draw(gameOverScreen);
+			
+			// Draw the player and his 'sonar'
+			window.DrawCircle(player.getRect().x + player.getRect().w / 2, player.getRect().y + player.getRect().h / 2,
+			                  Config::PLAYER_SIGHT_RANGE, 10, player.getSonarColor(), 32);
+			window.DrawCircle(player.getRect().x + player.getRect().w / 2, player.getRect().y + player.getRect().h / 2,
+			                  Data::sonar, 10, player.getSonarColor(), 32);
+			window.Draw(player, 0.0, player.isFacingLeft() ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL);
+			
+			// Move the player's "inner sonar"
+			++Data::sonar;
+			if (Data::sonar > Config::PLAYER_SIGHT_RANGE) {
+				Data::sonar = 0;
+			}
+			
+			// Draw the boat if the player isn't on it
+			if (player.getBoatPosition() != (SDL_Rect) {0, 0, 0, 0}) {
+				GameObject boat;
+				boat.setPath("Assets/Boat.png");
+				boat.setRect(player.getBoatPosition());
+				window.Draw(boat);
+			}
+			
+			// Draw the score
+			for (auto &t: texts) {
+				window.Draw(t);
+			}
+			
+			for (auto &l: lines) {
+				window.DrawLine(l);
+			}
+			
+			for (auto &w: warnings) {
+				window.Draw(w);
+			}
+			if (disembark_indicator != nullptr) {
+				window.Draw(*disembark_indicator, 0.0, player.isFacingRight() ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL);
+			}
+			break;
+		case Data::GameState::GAME_OVER:
+			gameOverScreen.Update(); // TODO: This would be better if it were in the Game::Update() method
+			window.Draw(gameOverScreen);
+			break;
+		case Data::GameState::MAIN_MENU:
+			mainMenuScreen.Update(); // TODO: This would be better if it were in the Game::Update() method
+			window.Draw(mainMenuScreen);
+			break;
 	}
 	window.Flip();
 }
@@ -448,7 +472,7 @@ void Game::Restart() {
 	Data::score = 0;
 	Data::difficulty = 1;
 	Data::sonar = 0;
-	Data::isAlive = true;
+	Data::gameState = Data::GameState::PLAYING;
 	
 	player.setPath("Assets/Boat.png");
 	player.setRect({Random::randint((int) (WindowData::SCREEN_WIDTH * 21 / 30), (int) (WindowData::SCREEN_WIDTH * 0.9)),
@@ -489,9 +513,71 @@ void Game::CheckWindowEvents() {
 	}
 }
 
+void Game::Update() {
+	switch (Data::gameState) {
+		case Data::GameState::PLAYING:
+			PlayingUpdate();
+			break;
+		case Data::GameState::GAME_OVER:
+			GameOverUpdate();
+			break;
+		case Data::GameState::MAIN_MENU:
+			MainMenuUpdate();
+			break;
+	}
+}
+
+void Game::MainMenuUpdate() {
+	mainMenuScreen.Update();
+}
+
+void Game::GameOverUpdate() {
+	gameOverScreen.Update();
+}
+
+void Game::generateMainMenu() {
+	const int twelfth_x = WindowData::SCREEN_WIDTH / 12;
+	const int twelfth_y = WindowData::SCREEN_HEIGHT / 12;
+	
+#define LETTER_RATIO(h, len) (h * 2 / 3 * len)
+	
+	SDL_Rect startRect = {twelfth_x, twelfth_y * 3, LETTER_RATIO(twelfth_y, 5), twelfth_y};
+	SDL_Rect quitRect = {twelfth_x, (int)(twelfth_y * 4.5), LETTER_RATIO(twelfth_y, 4), twelfth_y};
+	
+	mainMenuScreen.setBackground("Assets/MainMenu.png");
+	Text gameText("Morski Smetar", "Assets/Fonts/VCR_OSD_MONO.ttf", 100, (SDL_Color) {0xc0, 0xc0, 0xc0, 255}); // I came up with 0xc0 on the fly, can't be bothered to convert to decimal
+	Text startText("Start", "Assets/Fonts/VCR_OSD_MONO.ttf", 50, (SDL_Color) {0xc0, 0xc0, 0xc0, 255});
+	Text quitText("Quit", "Assets/Fonts/VCR_OSD_MONO.ttf", 50, (SDL_Color) {0xc0, 0xc0, 0xc0, 255});
+	
+	gameText.setRect({twelfth_x, twelfth_y, LETTER_RATIO((int)(twelfth_y * 1.5), 13), (int)(twelfth_y * 1.5)});
+	startText.setRect(startRect + (SDL_Rect){20, 5, -40, -10});
+	quitText.setRect(quitRect + (SDL_Rect){20, 5, -40, -10});
+
+	Button startButton(
+			startRect,
+			startText,
+			"Assets/Empty.png",
+			"Assets/Empty.png",
+			"Assets/Empty.png",
+			[this](){Data::gameState = Data::GameState::PLAYING;}
+	);
+	
+	Button quitButton(
+			quitRect,
+			quitText,
+			"Assets/Empty.png",
+			"Assets/Empty.png",
+			"Assets/Empty.png",
+			[this](){open = false;}
+	);
+	
+	mainMenuScreen.addText(gameText);
+	mainMenuScreen.addButton(startButton);
+	mainMenuScreen.addButton(quitButton);
+}
 
 // This comment is just a rant, it's not important nor is it relevant to the code
-// In the Game::Update() method, I mentioned that we need more games that play around with actual windows
+// In the Game::PlayingUpdate() method, I mentioned that we need more games that play around with actual windows
 // I wanted to mention a game that does this really well
 // It's called windowkill
 // The concept is that the game is on multiple windows you can move around etc.

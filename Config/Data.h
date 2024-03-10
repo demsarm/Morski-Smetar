@@ -4,11 +4,17 @@
 // Data used during the game
 
 namespace Data {
+	enum GameState {
+		MAIN_MENU,
+		PLAYING,
+		GAME_OVER
+	};
+
 	extern int score;
 	extern int difficulty;
 	extern int sonar;
 	extern int friendly_sonar;
-	extern bool isAlive;
+	extern GameState gameState;
 }
 
 #endif //MORSKI_SMETAR_DATA_H

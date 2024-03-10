@@ -42,14 +42,19 @@ class Game {
 	GameObject * disembark_indicator = nullptr;
 	
 	Screen gameOverScreen;
-	
+	Screen mainMenuScreen;
 	
 	bool open = true;
+	
+	void generateMainMenu();
 public:
 	Game() = default;
 	[[nodiscard]] bool isOpen() const;
 	void Setup();
 	void Update();
+	void PlayingUpdate();
+	void MainMenuUpdate();
+	void GameOverUpdate();
 	void CheckWindowEvents();
 	void Render(); // Having a separate fuction to render makes the code marginally cleaner, but may cause inefficiencies as some containers might be parsed multiple times (enemies, friendlies, waves & trash)
 	void CompleteStage();

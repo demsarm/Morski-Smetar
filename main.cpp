@@ -19,15 +19,9 @@ int main() {
 	// Game loop
 	while (game.isOpen()) {
 		Input::Update();
-		// If the player is alive, play the game
-		if (Data::isAlive) {
-			game.Update();
-		}
-		else { // If the player is dead (game over), show the game over screen
-			if (Input::getKey("R")) {
-				game.Restart();
-			}
-		}
+
+		game.Update(); // Player status is checked in here, no need for it to be in the main loop directly
+		
 		game.Render();
 		game.CheckWindowEvents();
 	}

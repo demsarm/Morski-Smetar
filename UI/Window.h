@@ -65,7 +65,7 @@ public:
 	[[nodiscard]] [[maybe_unused]] SDL_Window *getWindow() const;
 	
 	void centerWindow();
-	void checkQuit();
+	void checkQuit(); // It's an "Update-like" function; maybe it should be renamed to Update?
 };
 
 #endif //SDL_GAME_WINDOW_HPP
