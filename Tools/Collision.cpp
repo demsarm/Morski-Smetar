@@ -13,3 +13,11 @@ bool isColliding(const SDL_Rect &a, const SDL_Rect &b) {
 bool isColliding(const GameObject &a, const GameObject &b) {
 	return isColliding(a.getRect(), b.getRect());
 }
+
+bool isPointInRect(const std::pair<int, int> &point, const SDL_Rect &rect) {
+	return point.first >= rect.x && point.first <= rect.x + rect.w && point.second >= rect.y && point.second <= rect.y + rect.h;
+}
+
+bool isPointInRect(const std::pair<int, int> &point, const GameObject &object) {
+	return isPointInRect(point, object.getRect());
+}

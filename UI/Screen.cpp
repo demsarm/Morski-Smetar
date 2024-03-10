@@ -36,3 +36,25 @@ const std::vector<Text> &Screen::getTexts() const {
 void Screen::clearTexts() {
 	texts.clear();
 }
+
+void Screen::addButton(const Button &button) {
+	buttons.push_back(new Button(button));
+}
+
+void Screen::clearButtons() {
+	for (auto button : buttons) {
+		delete button;
+	}
+	buttons.clear();
+}
+
+const std::vector<GameObject *>& Screen::getButtons() const {
+	return buttons;
+}
+
+void Screen::Update() {
+	for (auto button : buttons) {
+		button->Update();
+	}
+}
+

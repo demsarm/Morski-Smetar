@@ -16,7 +16,6 @@ int main() {
 	
 	Game game;
 	game.Setup();
-	
 	// Game loop
 	while (game.isOpen()) {
 		Input::Update();

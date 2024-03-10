@@ -1,4 +1,5 @@
 #include "Game.h"
+#include "UI/Button.h"
 
 using namespace std;
 
@@ -10,6 +11,7 @@ bool Game::isOpen() const {
 	return open;
 }
 
+// This could be done in the constructor but whatever I don't care
 void Game::Setup() {
 	// Window setup
 	Window::init();
@@ -164,12 +166,25 @@ void Game::Update() {
 				// Create the game over screen - it's not done in Setup() because WindowData::SCREEN_WIDTH and WindowData::SCREEN_HEIGHT are changed during gameplay
 				gameOverScreen.setBackground("Assets/Game.png");
 				Text gameOverText("Game Over", "Assets/Fonts/VCR_OSD_MONO.ttf", 100, (SDL_Color) {255, 0, 0, 255});
-				Text restartText("Press R to restart", "Assets/Fonts/VCR_OSD_MONO.ttf", 30, (SDL_Color) {0x88, 0x88, 0x88, 255});
+				Text scoreText("Score: " + std::to_string(Data::score), "Assets/Fonts/VCR_OSD_MONO.ttf", 30, (SDL_Color) {0x88, 0x88, 0x88, 255});
+				int scoreLen = 18 * (int)scoreText.getText().length();
 				gameOverText.setRect({WindowData::SCREEN_WIDTH / 2 - 300, WindowData::SCREEN_HEIGHT / 2 - 50, 600, 100});
-				restartText.setRect({WindowData::SCREEN_WIDTH / 2 - 180, WindowData::SCREEN_HEIGHT / 2 + 50, 360, 30});
+				scoreText.setRect({WindowData::SCREEN_WIDTH / 2 - scoreLen/2, WindowData::SCREEN_HEIGHT / 2 + 100, scoreLen, 45}); // scoreLen has to be a variable because blah blah blah initializer list blah blah blah non-constant value blah blah blah
 				gameOverScreen.clearTexts();
 				gameOverScreen.addText(gameOverText);
-				gameOverScreen.addText(restartText);
+				gameOverScreen.addText(scoreText);
+				
+				Text buttonText("Restart", "Assets/Fonts/VCR_OSD_MONO.ttf", 30, (SDL_Color) {0x88, 0x88, 0x88, 255});
+				buttonText.setRect({WindowData::SCREEN_WIDTH / 2 - 70, WindowData::SCREEN_HEIGHT / 2 + 50, 140, 30});
+				Button restartButton((SDL_Rect){WindowData::SCREEN_WIDTH / 2 - 180, WindowData::SCREEN_HEIGHT / 2 + 50, 360, 30},
+							buttonText,
+							(SDL_Color){0, 0, 0, 0},
+							(SDL_Color){0, 0, 0, 0},
+							(SDL_Color){0, 0, 0, 0},
+							[this](){this->Restart();}
+				);
+				
+				gameOverScreen.addButton(restartButton);
 				// Some math to make the text look not squished
 				// Game Over - 9 letters
 				// Press R to restart - 18 letters
@@ -177,7 +192,7 @@ void Game::Update() {
 				// @ font size 100, Press R to restart would be 1200 px w (with same aspect ratio)
 				// lower the font size to 30 - both w and h would fall to 30% - 360 * 30, I believe
 			
-				// Note to self in the future: If you plan to change the text in the future, make sure to keep the 1:3 ratio
+				// Note to self in the future: If you plan to change the text in the future, make sure to keep the 2:3 ratio
 			}
 		}
 		
@@ -420,6 +435,7 @@ void Game::Render(){
 			window.Draw(*disembark_indicator, 0.0, player.isFacingRight() ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL);
 		}
 	} else {
+		gameOverScreen.Update(); // TODO: This would be better if it were in the Game::Update() method
 		window.Draw(gameOverScreen);
 	}
 	window.Flip();

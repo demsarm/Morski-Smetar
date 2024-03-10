@@ -8,6 +8,7 @@
 
 class Input {
 private:
+	static int mouseX, mouseY;
 	static const Uint8 *prevKeyState;
 	static const Uint8 *keyState;
 	static Uint32 prevMouseState;
@@ -35,6 +36,8 @@ public:
 	bool static getMouseButton(const std::string& button);
 	bool static getMouseButtonDown(const std::string& button);
 	bool static getMouseButtonUp(const std::string& button);
+	
+	static std::pair<int, int> getMousePosition();
 };
 
 #endif //MORSKI_SMETAR_INPUT_H

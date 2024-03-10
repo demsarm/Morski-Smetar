@@ -1,5 +1,9 @@
 #include "Input.h"
 
+// These should be overwritten on the first frame but yippee C++ static is yay goofy why must I suffer like this
+int Input::mouseX = 0;
+int Input::mouseY = 0;
+// Silly goofy C++17 way: auto [mouseX, mouseY] = std::pair<int, int>{0, 0}; (Doesn't seem to work either because static or because it's not in a function)
 const Uint8* Input::keyState = nullptr;
 const Uint8* Input::prevKeyState = nullptr;
 Uint32 Input::mouseState = 0;
@@ -231,7 +235,10 @@ std::map<std::string, int> Input::mouseMap = {
 	{"Middle", SDL_BUTTON_MIDDLE},
 	{"Right", SDL_BUTTON_RIGHT},
 	{"X1", SDL_BUTTON_X1},
-	{"X2", SDL_BUTTON_X2}
+	{"X2", SDL_BUTTON_X2},
+	{"left", SDL_BUTTON_LEFT}, // These are duplicate because god knows what the user will type (in case it's not obvious, I'm trying to make things not specific to my use case)
+	{"middle", SDL_BUTTON_MIDDLE},
+	{"right", SDL_BUTTON_RIGHT}
 };
 
 SDL_Scancode Input::mapKey(const std::string &key) {
@@ -282,11 +289,15 @@ void Input::Update() {
 	keyState = SDL_GetKeyboardState(nullptr);
 	
 	prevMouseState = mouseState;
-	mouseState = SDL_GetMouseState(nullptr, nullptr);
+	mouseState = SDL_GetMouseState(&mouseX, &mouseY);
 	
 	events.clear();
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
 		events.push_back(event);
 	}
+}
+
+std::pair<int, int> Input::getMousePosition() {
+	return {mouseX, mouseY};
 }

@@ -408,6 +408,10 @@ void Window::Draw(const Screen &screen) {
 	for (const auto& t : screen.getTexts()){
 		Draw(t);
 	}
+	
+	for (const auto& b : screen.getButtons()){
+		Draw(*((Button *)b));
+	}
 }
 
 void Window::checkQuit() {
@@ -421,4 +425,9 @@ void Window::checkQuit() {
 			running = false;
 		}
 	}
+}
+
+void Window::Draw(const Button &button) {
+	Draw(*((GameObject *) &button), 0, SDL_FLIP_NONE); // The pointer cast is kind of dirty, but it's the quickest way I found to convince it to draw it as a GameObject
+	Draw(*((Text *)&button.getText()));
 }

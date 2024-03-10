@@ -46,6 +46,7 @@ public:
 	[[maybe_unused]] void Draw(const SDL_Rect& rect, const std::string& texture_path);
 	void Draw(const GameObject& object, double angle = 0.0, SDL_RendererFlip flip = SDL_FLIP_NONE);
 	void Draw(const Text& text);
+	void Draw(const Button& button);
 	void Draw(const Screen& screen);
 	void DrawLine(int x1, int y1, int x2, int y2, int width, SDL_Color color);
 	void DrawLine(const Line& line);
