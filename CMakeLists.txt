@@ -48,8 +48,6 @@ add_executable(Morski_Smetar main.cpp
         UI/Screen.h
         Tools/File.cpp
         Tools/File.h
-        Tools/SHA256.cpp
-        Tools/SHA256.h
         UI/Input.cpp
         UI/Input.h
         UI/Button.cpp
