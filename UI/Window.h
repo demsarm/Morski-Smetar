@@ -31,6 +31,7 @@ public:
 	void changeWindowSize(int w, int h);
 	
 	std::pair<int, int> getWindowsPosition();
+	[[maybe_unused]]
 	void setWindowsPosition(int x, int y);
 	
 	Window();

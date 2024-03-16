@@ -12,9 +12,12 @@ namespace Random{
 	int randint(int max);
 	int randint(int min, int max);
 	
+	// These two are leftovers from another project, no reason not for them to stay - compiler's going to cut 'em for optimization anyway
+	[[maybe_unused]]
 	int Gaussian(int mean, int deviation);
 	
-	std::vector<std::vector<uint8_t>> worleyNoise(int width, int height, int points, int seed);
+	[[maybe_unused]]
+	std::vector<std::vector<uint8_t>> worleyNoise(int width, int height, int points);
 }
 
 #endif //SDL_GAME_RANDOM_HPP

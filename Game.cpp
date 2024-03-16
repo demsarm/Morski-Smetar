@@ -393,10 +393,10 @@ void Game::Render(){
 				if (f.getType() == Friendly::Type::LAND) {
 					window.DrawCircle(f.getRect().x + f.getRect().w / 2,
 					                  f.getRect().y + f.getRect().h / 2,
-					                  Data::friendly_sonar, 10, Friendly::getSonarColor(), 32);
+					                  Data::friendly_sonar, 5, Friendly::getSonarColor(), 32);
 					window.DrawCircle(f.getRect().x + f.getRect().w / 2,
 					                  f.getRect().y + f.getRect().h / 2,
-					                  Config::ALLY_SIGHT_RANGE, 10, Friendly::getSonarColor(), 32);
+					                  Config::ALLY_SIGHT_RANGE, 5, Friendly::getSonarColor(), 32);
 				}
 			}
 			
@@ -407,9 +407,9 @@ void Game::Render(){
 			
 			// Draw the player and his 'sonar'
 			window.DrawCircle(player.getRect().x + player.getRect().w / 2, player.getRect().y + player.getRect().h / 2,
-			                  Config::PLAYER_SIGHT_RANGE, 10, player.getSonarColor(), 32);
+			                  Config::PLAYER_SIGHT_RANGE, 5, player.getSonarColor(), 32);
 			window.DrawCircle(player.getRect().x + player.getRect().w / 2, player.getRect().y + player.getRect().h / 2,
-			                  Data::sonar, 10, player.getSonarColor(), 32);
+			                  Data::sonar, 5, player.getSonarColor(), 32);
 			window.Draw(player, 0.0, player.isFacingLeft() ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL);
 			
 			// Move the player's "inner sonar"

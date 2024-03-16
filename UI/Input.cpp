@@ -1,3 +1,4 @@
+#include <iostream>
 #include "Input.h"
 
 // These should be overwritten on the first frame but yippee C++ static is yay goofy why must I suffer like this
@@ -11,6 +12,7 @@ Uint32 Input::prevMouseState = 0;
 std::vector<SDL_Event> Input::events;
 
 // I wrote a Python script to generate this map I don't care if were meant to be learning C++ Python is so much more convenient
+// Got the scan codes from https://wiki.libsdl.org/SDL2/SDL_Scancode - the csv should be in etc/
 std::map<std::string, SDL_Scancode> Input::keyMap = {
 	{"0", SDL_SCANCODE_0},
 	{"1", SDL_SCANCODE_1},

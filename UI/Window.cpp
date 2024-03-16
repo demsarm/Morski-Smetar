@@ -273,14 +273,13 @@ void Window::DrawLine(int x1, int y1, int x2, int y2, int width, SDL_Color color
 void Window::DrawCircle(int x, int y, int r, int w, SDL_Color color, int accuracy) {
 	int n = 32;
 	for (int i = 0; i < n; i++){
-		DrawLine(r * sin(2 * M_PI * i / accuracy) + x,
-		                r * cos(2 * M_PI * i / accuracy) + y,
-		                r * sin(2 * M_PI * (i + 1) / accuracy) + x,
-						r * cos(2 * M_PI * (i + 1) / accuracy) + y,
-		                5, color);
+		DrawLine((int)(r * sin(2 * M_PI * i / accuracy) + x),
+				(int)(r * cos(2 * M_PI * i / accuracy) + y),
+				(int)(r * sin(2 * M_PI * (i + 1) / accuracy) + x),
+				(int)(r * cos(2 * M_PI * (i + 1) / accuracy) + y),
+		                w, color);
 		
 	}
-	
 }
 
 /**

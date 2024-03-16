@@ -1,6 +1,5 @@
 //#define SDL_MAIN_HANDLED // Apparently needed for mingw to work
 
-#include "Config/Data.h"
 
 #include "Game.h"
 #include "UI/Input.h"

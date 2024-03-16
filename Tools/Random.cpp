@@ -43,10 +43,9 @@ int Random::randint(int min, int max) {
  * @param width The width of the noise
  * @param height The height of the noise
  * @param points The number of points to use
- * @param seed The seed to use
  * @return A 2D vector of worley noise
  */
-std::vector<std::vector<uint8_t>> Random::worleyNoise(int width, int height, int points, int seed) {
+std::vector<std::vector<uint8_t>> Random::worleyNoise(int width, int height, int points) {
 	std::vector<std::vector<uint8_t>> noise;
 	
 	std::vector<std::vector<int>> points_list;

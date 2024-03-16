@@ -5,7 +5,6 @@
 
 #include <thread>
 
-#include <iostream>
 
 class Player : public GameObject {
 public: // This is why C# handles public and private better

@@ -26,7 +26,7 @@ Ce se vsaj dva nasprotnika postavita drug poleg drugega, takrat ju je nemogoce u
 Tako na morju kot na kopnem se nahajajo tudi nasi zavezniki in moramo paziti, da jih ne unicimo (negativne tocke!!).
 Z vsako stopnjo se tezavnost veca  -  poveca se mreza (polje) in/ali stevilo nasprotnikov (lahko tudi hitrost) oz. smeti in/ali omejimo cas – po zelji.
 
-Igralec /Vegovec  se (na zacetku) prikaze na nakljucnem mestu. Tudi vsi nasprotniki so nakljucno skriti v polju (del kopna), smeti pa so nakljucno postavljene na morju.
+Igralec /Vegovec se (na zacetku) prikaze na nakljucnem mestu. Tudi vsi nasprotniki so nakljucno skriti v polju (del kopna), smeti pa so nakljucno postavljene na morju.
 Zavezniki se lahko kadarkoli postavijo, ni obvezno, da so ze na zacetku postavljeni v polju.  
 Igralec se lahko premika v vseh smereh, sledi nasprotnikom in jih unicuje, ter se po morju vozi z ladjo (zamenja se slika igralca) in pobira smeti.
 Da bi se igralec lahko vkrcal na ladjo, se mora ladja dotikati kopna.
@@ -43,8 +43,9 @@ Menu na začetku igrice nam omogoča, da vpišemo svoje ime in izberemo eno izme
 Ker je možno, da se igranja igrice lotijo različni (ekologi) / vegovci, moramo njihovo >>udejstvovanje<< tudi nekako ovrednotiti – vsaka posamezna stopnja prinese določeno število točk; čas igranja lahko t
 udi nekaj velja.  Na koncu se izpiše SAMO pet najboljših rezultatov in njihovih nosilcev (uporaba datotek - zapišeta se dva podatka za vsako igro – ime in točke (ali čas ... ali kej tretjega).
 Zadnji igralec mora imeti možnost pregleda svojih premikov po polju oz. replay
-In če nas nekdo zmoti v uničevanju smeti, ko bi morali npr. vaditi programiranje, moramo izbrati prisilni izhod (tipka esc) in shranjevanje igrice. Torej, dodatna opcija shranjevanja bistvenih podatkov in n
-adaljevanja igranja.
+In če nas nekdo zmoti v uničevanju smeti, ko bi morali npr. vaditi programiranje,
+moramo izbrati prisilni izhod (tipka esc) in shranjevanje igrice.
+Torej, dodatna opcija shranjevanja bistvenih podatkov in nadaljevanja igranja.
 Kaj še lahko poveča vrednost igrice (še dodatno zviša pozitivno oceno):
 Izbira velikosti zaslona
 Tudi naši zavezniki lahko pobirajo smeti in uničujejo nasprotnike
