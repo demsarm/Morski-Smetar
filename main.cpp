@@ -25,5 +25,7 @@ int main() {
 		game.Render();
 		game.CheckWindowEvents();
 	}
+	
+	game.writeHighscores();
 	return 0;
 }

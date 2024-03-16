@@ -26,12 +26,13 @@ public:
 	[[nodiscard]] int getFontSize() const;
 	[[maybe_unused]] void setFontSize(int fontSize);
 
-	[[nodiscard]] const std::string &getText() const;
+	[[nodiscard]] virtual std::string& getText() const;
 	[[maybe_unused]] void setText(const std::string &text);
 	
 	[[nodiscard]] const SDL_Color &getColor() const;
-	[[maybe_unused]] void setColor(const SDL_Color &color);
+	[[maybe_unused]] void setColor(const SDL_Color &color) override;
 	
+	Text& operator+=(const std::string& text);
 };
 
 

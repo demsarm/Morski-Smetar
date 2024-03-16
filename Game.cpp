@@ -1,5 +1,9 @@
 #include "Game.h"
 #include "UI/Button.h"
+#include "Tools/File.h"
+
+// I have no clue where this will be used (in the generate____Screen functions, but I'm not sure where else), so it goes here
+#define LETTER_RATIO(h, len) (h * 2 / 3 * len)
 
 using namespace std;
 
@@ -16,12 +20,14 @@ void Game::Setup() {
 	// Window setup
 	Window::init();
 	Window::setWindowSize(800, 600);
-	
 	open = true;
 	
 	generateMainMenu();
+	generateUsernameScreen();
 	
 	window.Raise();
+	
+	Input::Setup();
 	
 //	Window test("Test", 100, 100, WindowData::SCREEN_WIDTH, WindowData::SCREEN_HEIGHT, 0);
 //	window = Window("Morski Smetar", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WindowData::SCREEN_WIDTH, WindowData::SCREEN_HEIGHT, 0);
@@ -69,7 +75,19 @@ void Game::Setup() {
 	land.setColor((SDL_Color) {220, 220, 120, 255});
 	land.setRect({0, 0, WindowData::SCREEN_WIDTH / 3, WindowData::SCREEN_HEIGHT});
 	
+	// Need them names for score keeping, and I'm not going to force the player to input their name
+	const std::vector<std::string> namesList = {"Anita Bath", "Al Beback", "Barry D'Alive", "Justin Thyme", "Sue Permann", "Dee Zaster", "Polly Ester", "Sal Monella", "Bill Board", "Barb D. Wyer", "Max Power", "Skel Etal", "Lou Scannon", "Pete Sariya", "Vlad"};
+	username = namesList[Random::randint((int)(namesList.size()))]; // It should be fine to convert to string here, the list probably won't ever be longer than 2^31 - 1 (I mean how would you even get that many names?)
 	
+	// TODO the highscores file gets wiped for whatever reason GOD I HATE C++
+	// Load the highscores
+	File scores(absolutePath("highscores.txt"));
+	std::string name = scores.readLine(); // I'd use do-while but our lord and savior Clang-Tidy says do-while is not good for whatever reason
+	while (!name.empty()) {
+		int space = (int)(name.find_last_of(' ')); // TODO: Remember to put character limit on username
+		highscores.insert({name.substr(0, space), std::stoi(name.substr(space + 1))}); // By Jove, I hope stoi works like it should I have so many negative experiences with it
+		name = scores.readLine();
+	}
 }
 
 void Game::PlayingUpdate() {
@@ -166,40 +184,9 @@ void Game::PlayingUpdate() {
 			} else {
 				Data::gameState = Data::GameState::GAME_OVER;
 				// Create the game over screen - it's not done in Setup() because WindowData::SCREEN_WIDTH and WindowData::SCREEN_HEIGHT are changed during gameplay
-				gameOverScreen.setBackground("Assets/Game.png");
-				Text gameOverText("Game Over", "Assets/Fonts/VCR_OSD_MONO.ttf", 100, (SDL_Color) {255, 0, 0, 255});
-				Text scoreText("Score: " + std::to_string(Data::score), "Assets/Fonts/VCR_OSD_MONO.ttf", 30, (SDL_Color) {0xff, 0x40, 0x40, 255});
-				int scoreLen = 18 * (int)scoreText.getText().length();
-				gameOverText.setRect({WindowData::SCREEN_WIDTH / 2 - 300, WindowData::SCREEN_HEIGHT / 2 - 50, 600, 100});
-				scoreText.setRect({WindowData::SCREEN_WIDTH / 2 - scoreLen/2, WindowData::SCREEN_HEIGHT / 2 + 50, scoreLen, 30}); // scoreLen has to be a variable because blah blah blah initializer list blah blah blah non-constant value blah blah blah
-				gameOverScreen.clearTexts();
-				gameOverScreen.clearButtons();
-				gameOverScreen.addText(gameOverText);
-				gameOverScreen.addText(scoreText);
+				generateGameOverScreen();
 				
-				Text restartText("Restart", "Assets/Fonts/VCR_OSD_MONO.ttf", 30, (SDL_Color) {0x88, 0x88, 0x88, 255});
-				restartText.setRect({WindowData::SCREEN_WIDTH / 2 - 70, WindowData::SCREEN_HEIGHT / 2 + 100, 140, 30});
-				Button restartButton((SDL_Rect){WindowData::SCREEN_WIDTH / 2 - 180, WindowData::SCREEN_HEIGHT / 2 + 100, 360, 30},
-				                     restartText,
-				                     "Assets/Empty.png",
-				                     "Assets/Empty.png",
-				                     "Assets/Empty.png",
-				                     [this](){this->Restart();}
-				);
-				
-				Text menuText("Main Menu", "Assets/Fonts/VCR_OSD_MONO.ttf", 30, (SDL_Color) {0x88, 0x88, 0x88, 255});
-				menuText.setRect({WindowData::SCREEN_WIDTH / 2 - 70, WindowData::SCREEN_HEIGHT / 2 + 150, 180, 30});
-				Button menuButton((SDL_Rect){WindowData::SCREEN_WIDTH / 2 - 90, WindowData::SCREEN_HEIGHT / 2 + 150, 180, 30},
-				                   menuText,
-				                   "Assets/Empty.png",
-				                   "Assets/Empty.png",
-				                   "Assets/Empty.png",
-				                   [](){Data::gameState = Data::GameState::MAIN_MENU;}
-				);
-				
-				
-				gameOverScreen.addButton(restartButton);
-				gameOverScreen.addButton(menuButton);
+				highscores.insert({username, Data::score}); // Since C++ file I/O is super slow (O(n)), I'll write to the file only when the game is closed (or maybe when the player exits to menu as well)
 				// Some math to make the text look not squished
 				// Game Over - 9 letters
 				// Press R to restart - 18 letters
@@ -283,6 +270,8 @@ void Game::PlayingUpdate() {
 }
 
 void Game::CompleteStage() {
+
+	
 	++Data::difficulty;
 	
 	enemies.clear(); // This may be kind of redundant because why would you call this if enemies isn't empty
@@ -454,12 +443,13 @@ void Game::Render(){
 			}
 			break;
 		case Data::GameState::GAME_OVER:
-			gameOverScreen.Update(); // TODO: This would be better if it were in the Game::Update() method
 			window.Draw(gameOverScreen);
 			break;
 		case Data::GameState::MAIN_MENU:
-			mainMenuScreen.Update(); // TODO: This would be better if it were in the Game::Update() method
 			window.Draw(mainMenuScreen);
+			break;
+		case Data::GameState::USERNAME:
+			window.Draw(usernameScreen);
 			break;
 	}
 	window.Flip();
@@ -524,6 +514,9 @@ void Game::Update() {
 		case Data::GameState::MAIN_MENU:
 			MainMenuUpdate();
 			break;
+		case Data::GameState::USERNAME:
+			UsernameUpdate();
+			break;
 	}
 }
 
@@ -535,22 +528,68 @@ void Game::GameOverUpdate() {
 	gameOverScreen.Update();
 }
 
+void Game::UsernameUpdate() {
+	// I was going to have a class InputField, but it'd only be used once and oops it mysteriously disappeared when it didn't feel like working why would that be
+	if (Input::getKey("Return")){ // I'd use getKeyUp, but I can't be bothered to copy the entirety of the keyboard state to another variable, so I'll just use getKey
+		Data::gameState = Data::GameState::MAIN_MENU;
+	}
+	
+	// Because I know the pain of having to delete text character by character
+	if ((Input::getKey("Right Ctrl") || Input::getKey("Left Ctrl")) && Input::getKey("Backspace")){ // Don't need to check if the string is empty because the function does that for me
+		username.clear();
+	}
+	
+	backspaceCooldown = backspaceCooldown > 0 ? backspaceCooldown - 1 : 0;
+	if (Input::getKey("Backspace") && !username.empty() && !backspaceCooldown){
+		if (!username.empty()){
+			username.pop_back();
+		}
+		backspaceCooldown = 20; // So it doesn't evaporate the entire string in 7.34 frames, but ten should still be low enough to not be annoying
+	}
+	for (auto &event : Input::getEvents()){
+		switch (event.type){
+			case SDL_TEXTINPUT:
+				username.size() < 20 ? username += event.text.text : username; // Can't be bothered to write an if statement
+				break;
+		}
+	}
+	Text& usernameText = (Text&)usernameScreen.getTexts()[0]; // I FOUND A USE FOR REFERENCES I NEVER THOUGHT I'D SEE THE DAY
+	usernameText.setText(username);
+	usernameText.setRect({WindowData::SCREEN_WIDTH / 2 - 200, WindowData::SCREEN_HEIGHT / 2 - 50, LETTER_RATIO(30, (int)username.size()), 30});
+	usernameScreen.Update();
+}
+
+void Game::writeHighscores() {
+	File scores(absolutePath("highscores.txt"));
+	scores.clearFile();
+	auto it = highscores.begin();
+	for (int i = 5; i-- && it != highscores.end(); it++) {
+		scores.write(it->first + " " + std::to_string(it->second));
+	}
+}
+
+/**
+ * @brief This function generates the main menu
+ * @warning The function does not clear the main menu screen, so it should be called only once
+ */
 void Game::generateMainMenu() {
 	const int twelfth_x = WindowData::SCREEN_WIDTH / 12;
 	const int twelfth_y = WindowData::SCREEN_HEIGHT / 12;
 	
-#define LETTER_RATIO(h, len) (h * 2 / 3 * len)
 	
 	SDL_Rect startRect = {twelfth_x, twelfth_y * 3, LETTER_RATIO(twelfth_y, 5), twelfth_y};
-	SDL_Rect quitRect = {twelfth_x, (int)(twelfth_y * 4.5), LETTER_RATIO(twelfth_y, 4), twelfth_y};
+	SDL_Rect usernameRect = {twelfth_x, (int)(twelfth_y * 4.5), LETTER_RATIO(twelfth_y, 5), twelfth_y};
+	SDL_Rect quitRect = {twelfth_x, (int)(twelfth_y * 6), LETTER_RATIO(twelfth_y, 4), twelfth_y};
 	
 	mainMenuScreen.setBackground("Assets/MainMenu.png");
 	Text gameText("Morski Smetar", "Assets/Fonts/VCR_OSD_MONO.ttf", 100, (SDL_Color) {0xc0, 0xc0, 0xc0, 255}); // I came up with 0xc0 on the fly, can't be bothered to convert to decimal
+	Text usernameText("Set username", "Assets/Fonts/VCR_OSD_MONO.ttf", 50, (SDL_Color) {0xc0, 0xc0, 0xc0, 255});
 	Text startText("Start", "Assets/Fonts/VCR_OSD_MONO.ttf", 50, (SDL_Color) {0xc0, 0xc0, 0xc0, 255});
 	Text quitText("Quit", "Assets/Fonts/VCR_OSD_MONO.ttf", 50, (SDL_Color) {0xc0, 0xc0, 0xc0, 255});
 	
 	gameText.setRect({twelfth_x, twelfth_y, LETTER_RATIO((int)(twelfth_y * 1.5), 13), (int)(twelfth_y * 1.5)});
-	startText.setRect(startRect + (SDL_Rect){20, 5, -40, -10});
+	startText.setRect(startRect + (SDL_Rect){20, 5, -40, -10}); // Slightly smaller than the button size
+	usernameText.setRect(usernameRect + (SDL_Rect){20, 5, -40, -10});
 	quitText.setRect(quitRect + (SDL_Rect){20, 5, -40, -10});
 
 	Button startButton(
@@ -559,7 +598,16 @@ void Game::generateMainMenu() {
 			"Assets/Empty.png",
 			"Assets/Empty.png",
 			"Assets/Empty.png",
-			[this](){Data::gameState = Data::GameState::PLAYING;}
+			[](){Data::gameState = Data::GameState::PLAYING;}
+	);
+	
+	Button usernameButton(
+			usernameRect,
+			usernameText,
+			"Assets/Empty.png",
+			"Assets/Empty.png",
+			"Assets/Empty.png",
+			[](){Data::gameState = Data::GameState::USERNAME;}
 	);
 	
 	Button quitButton(
@@ -573,7 +621,70 @@ void Game::generateMainMenu() {
 	
 	mainMenuScreen.addText(gameText);
 	mainMenuScreen.addButton(startButton);
+	mainMenuScreen.addButton(usernameButton);
 	mainMenuScreen.addButton(quitButton);
+}
+
+void Game::generateGameOverScreen() {
+	gameOverScreen.setBackground("Assets/Game.png");
+	Text gameOverText("Game Over", "Assets/Fonts/VCR_OSD_MONO.ttf", 100, (SDL_Color) {255, 0, 0, 255});
+	Text scoreText("Score: " + std::to_string(Data::score), "Assets/Fonts/VCR_OSD_MONO.ttf", 30, (SDL_Color) {0xff, 0x40, 0x40, 255});
+	int scoreLen = 18 * (int)scoreText.getText().length();
+	gameOverText.setRect({WindowData::SCREEN_WIDTH / 2 - 300, WindowData::SCREEN_HEIGHT / 2 - 50, 600, 100});
+	scoreText.setRect({WindowData::SCREEN_WIDTH / 2 - scoreLen/2, WindowData::SCREEN_HEIGHT / 2 + 50, scoreLen, 30}); // scoreLen has to be a variable because blah blah blah initializer list blah blah blah non-constant value blah blah blah
+	gameOverScreen.clearTexts();
+	gameOverScreen.clearButtons();
+	gameOverScreen.addText(gameOverText);
+	gameOverScreen.addText(scoreText);
+	
+	Text restartText("Restart", "Assets/Fonts/VCR_OSD_MONO.ttf", 30, (SDL_Color) {0x88, 0x88, 0x88, 255});
+	restartText.setRect({WindowData::SCREEN_WIDTH / 2 - 70, WindowData::SCREEN_HEIGHT / 2 + 100, 140, 30});
+	Button restartButton((SDL_Rect){WindowData::SCREEN_WIDTH / 2 - 180, WindowData::SCREEN_HEIGHT / 2 + 100, 360, 30},
+	                     restartText,
+	                     "Assets/Empty.png",
+	                     "Assets/Empty.png",
+	                     "Assets/Empty.png",
+	                     [this](){this->Restart();}
+	);
+	
+	Text menuText("Main Menu", "Assets/Fonts/VCR_OSD_MONO.ttf", 30, (SDL_Color) {0x88, 0x88, 0x88, 255});
+	menuText.setRect({WindowData::SCREEN_WIDTH / 2 - 70, WindowData::SCREEN_HEIGHT / 2 + 150, 180, 30});
+	Button menuButton((SDL_Rect){WindowData::SCREEN_WIDTH / 2 - 90, WindowData::SCREEN_HEIGHT / 2 + 150, 180, 30},
+	                  menuText,
+	                  "Assets/Empty.png",
+	                  "Assets/Empty.png",
+	                  "Assets/Empty.png",
+	                  [](){Data::gameState = Data::GameState::MAIN_MENU;}
+	);
+	
+	
+	gameOverScreen.addButton(restartButton);
+	gameOverScreen.addButton(menuButton);
+}
+
+void Game::generateUsernameScreen() {
+	usernameScreen.setBackground("Assets/MainMenu.png");
+	
+	SDL_Rect usernameRect = {WindowData::SCREEN_WIDTH / 2 - 200, WindowData::SCREEN_HEIGHT / 2 - 50, LETTER_RATIO(30, (int)username.size()), 30};
+	Text usernameText(username, "Assets/Fonts/VCR_OSD_MONO.ttf", 30, (SDL_Color) {0xc0, 0xc0, 0xc0, 255});
+	usernameText.setRect(usernameRect);
+	usernameScreen.addText(usernameText); // So it should be at index [0], this is important for the update function
+	
+	SDL_Rect submitRect = {WindowData::SCREEN_WIDTH / 2 - 70, WindowData::SCREEN_HEIGHT / 2 + 100, 140, 30};
+	Text submitText("Submit", "Assets/Fonts/VCR_OSD_MONO.ttf", 30, (SDL_Color) {0xc0, 0xc0, 0xc0, 255});
+	submitText.setRect(submitRect);
+	Button submitButton(submitRect + (SDL_Rect){-20, -20, 40, 40},
+	                    submitText,
+						"Assets/Empty.png",
+	                    "Assets/Empty.png",
+	                    "Assets/Empty.png",
+	                    [](){
+	                      Data::gameState = Data::GameState::MAIN_MENU;
+	                    }
+	);
+	
+	usernameScreen.addButton(submitButton);
+	
 }
 
 // This comment is just a rant, it's not important nor is it relevant to the code

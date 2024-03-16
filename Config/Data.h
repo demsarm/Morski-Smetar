@@ -7,7 +7,8 @@ namespace Data {
 	enum GameState {
 		MAIN_MENU,
 		PLAYING,
-		GAME_OVER
+		GAME_OVER,
+		USERNAME // Username input screen
 	};
 
 	extern int score;

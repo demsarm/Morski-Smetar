@@ -38,23 +38,19 @@ void Screen::clearTexts() {
 }
 
 void Screen::addButton(const Button &button) {
-	buttons.push_back(new Button(button));
+	buttons.push_back(Button(button)); // Copy because I'm not sure how it would work with the references
 }
 
 void Screen::clearButtons() {
-	for (auto button : buttons) {
-		delete button;
-	}
 	buttons.clear();
 }
 
-const std::vector<GameObject *>& Screen::getButtons() const {
+const std::vector<Button>& Screen::getButtons() const {
 	return buttons;
 }
 
 void Screen::Update() {
-	for (auto button : buttons) {
-		button->Update();
+	for (auto& button : buttons) {
+		button.Update();
 	}
 }
-

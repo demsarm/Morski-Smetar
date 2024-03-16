@@ -23,7 +23,8 @@ public:
 	[[nodiscard]] Design getDesign() const;
 	
 	void setPath(const std::string& path);
-	[[maybe_unused]] void setColor(const SDL_Color& color);
+	
+	[[maybe_unused]] virtual void setColor(const SDL_Color& color);
 	void setRect(const SDL_Rect& rect);
 	
 	virtual void Update();

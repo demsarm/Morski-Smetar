@@ -198,7 +198,8 @@ std::map<std::string, SDL_Scancode> Input::keyMap = {
 	{"R", SDL_SCANCODE_R},
 	{"Right Alt", SDL_SCANCODE_RALT},
 	{"Right Ctrl", SDL_SCANCODE_RCTRL},
-	{"Return", SDL_SCANCODE_RETURN2},
+	{"Return", SDL_SCANCODE_RETURN},
+	{"Return2", SDL_SCANCODE_RETURN2}, // Don't know why there are two returns; both are labeled as "Return" in the wiki, so I had to change the second one to "Return2"
 	{"Right GUI", SDL_SCANCODE_RGUI},
 	{"Right", SDL_SCANCODE_RIGHT},
 	{"]", SDL_SCANCODE_RIGHTBRACKET},
@@ -300,4 +301,12 @@ void Input::Update() {
 
 std::pair<int, int> Input::getMousePosition() {
 	return {mouseX, mouseY};
+}
+
+std::vector<SDL_Event>& Input::getEvents() {
+	return events;
+}
+
+void Input::Setup() {
+	SDL_StartTextInput();
 }

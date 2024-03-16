@@ -5,7 +5,6 @@
 #include "SDL2/SDL_image.h"
 #include "SDL2/SDL_ttf.h"
 
-#include "iostream"
 #include "string"
 #include "thread"
 
@@ -47,7 +46,7 @@ public:
 	void Draw(const GameObject& object, double angle = 0.0, SDL_RendererFlip flip = SDL_FLIP_NONE);
 	void Draw(const Text& text);
 	void Draw(const Button& button);
-	void Draw(const Screen& screen);
+	void Draw(Screen& screen);
 	void DrawLine(int x1, int y1, int x2, int y2, int width, SDL_Color color);
 	void DrawLine(const Line& line);
 	

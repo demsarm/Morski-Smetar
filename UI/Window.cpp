@@ -1,6 +1,7 @@
 #include "Window.h"
 
 #include <cmath>
+#include <iostream>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -401,7 +402,7 @@ void Window::DrawLine(const Line &line) {
 	DrawLine(line.getP1().first, line.getP1().second, line.getP2().first, line.getP2().second, line.getWidth(), line.getColor());
 }
 
-void Window::Draw(const Screen &screen) {
+void Window::Draw(Screen& screen) {
 	Clear((SDL_Color){0, 0, 0, 255});
 	// This draw method doesn't use absolutePath because I am very consistent (I'm not)
 	Draw((SDL_Rect){0, 0, WindowData::SCREEN_WIDTH, WindowData::SCREEN_HEIGHT}, absolutePath(screen.getBackground()));
@@ -409,21 +410,19 @@ void Window::Draw(const Screen &screen) {
 		Draw(t);
 	}
 	
-	for (const auto& b : screen.getButtons()){
-		Draw(*((Button *)b));
+	for (const auto& b : screen.getButtons()) {
+		Draw(b);
 	}
 }
 
 void Window::checkQuit() {
-	SDL_Event event;
-	while (SDL_PollEvent(&event)){
+	for (auto event : Input::getEvents()){
 		if (event.type == SDL_QUIT){
 			running = false;
 		}
-		const Uint8* keyboardState = SDL_GetKeyboardState(nullptr);
-		if (keyboardState[SDL_SCANCODE_ESCAPE]){
-			running = false;
-		}
+	}
+	if (Input::getKey("escape")){
+		running = false;
 	}
 }
 

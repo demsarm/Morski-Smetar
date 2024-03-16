@@ -15,11 +15,12 @@ class Screen {
 	std::string background;
 	// TODO: Make everything on a screen an std::vector<GameObject *> so that we can have buttons and stuff
 	std::vector<Text> texts;
-	std::vector<GameObject *> buttons;
+	std::vector<Button> buttons;
 public:
 	void Update();
 	
 	Screen() = default;
+	[[maybe_unused]]
 	explicit Screen(const std::string& background);
 	Screen(const Screen& other);
 	
@@ -33,7 +34,7 @@ public:
 	void addButton(const Button& button);
 	void clearButtons();
 	
-	[[nodiscard]] const std::vector<GameObject *>& getButtons() const;
+	[[nodiscard]] const std::vector<Button>& getButtons() const;
 };
 
 

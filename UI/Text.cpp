@@ -31,10 +31,15 @@ int Text::getFontSize() const {
 	return font_size;
 }
 
-const std::string &Text::getText() const {
-	return text;
+std::string& Text::getText() const {
+	return (std::string&)text; // Binding reference to type 'basic_string<...>' to value of type 'const basic_string<...>' drops 'const' qualifier - hence the cast
 }
 
 const SDL_Color &Text::getColor() const {
 	return color;
+}
+
+Text &Text::operator+=(const std::string &str) {
+	text += str;
+	return *this;
 }
