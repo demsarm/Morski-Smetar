@@ -46,6 +46,11 @@ void Button::Update() {
 	}
 }
 
+/**
+ * @brief Sets the onClick function of the button
+ * @param func The function to be called when the button is clicked
+ * @note The function should not take any arguments and any return value will be ignored - use a lambda if you need to pass arguments
+ */
 void Button::setOnClick(const std::function<void()> &func) {
 	onClick = func;
 }

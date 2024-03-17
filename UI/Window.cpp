@@ -7,7 +7,11 @@
 #define M_PI 3.14159265358979323846
 #endif // Because x86_64-w64-mingw32-g++ doesn't know what M_PI is apparently
 
-
+/**
+ * @brief gets the screen size
+ * @return The screen size
+ * @warning Doesn't work
+ */
 std::pair<int, int> getScreenSize() {
 	SDL_Window *window = SDL_CreateWindow(
 			"You're not supposed to see this why can you see it something went horribly wrong I just want to know your resolution so I can base the actual window's size off of that please help me I'm stuck in a computer and I can't get out",
@@ -397,10 +401,18 @@ Window::Window() {
 	running = false;
 }
 
+/**
+ * @brief Draws a line
+ * @param line The line to be drawn
+ */
 void Window::DrawLine(const Line &line) {
 	DrawLine(line.getP1().first, line.getP1().second, line.getP2().first, line.getP2().second, line.getWidth(), line.getColor());
 }
 
+/**
+ * @brief Draws a screen
+ * @param screen The screen to be drawn
+ */
 void Window::Draw(Screen& screen) {
 	Clear((SDL_Color){0, 0, 0, 255});
 	// This draw method doesn't use absolutePath because I am very consistent (I'm not)
@@ -414,6 +426,9 @@ void Window::Draw(Screen& screen) {
 	}
 }
 
+/**
+ * @brief Checks if the window should quit
+ */
 void Window::checkQuit() {
 	for (auto event : Input::getEvents()){
 		if (event.type == SDL_QUIT){
@@ -425,6 +440,10 @@ void Window::checkQuit() {
 	}
 }
 
+/**
+ * @brief Draws a button
+ * @param button The button to be drawn
+ */
 void Window::Draw(const Button &button) {
 	Draw(*((GameObject *) &button), 0, SDL_FLIP_NONE); // The pointer cast is kind of dirty, but it's the quickest way I found to convince it to draw it as a GameObject
 	Draw(*((Text *)&button.getText()));

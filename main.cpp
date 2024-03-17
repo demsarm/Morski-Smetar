@@ -12,6 +12,14 @@ int WinMain() {
 int main() {
 #endif
 //	SDL_SetMainReady(); // If there are problems, try removing this line to see if anything's changed. It lets SDL functions know the initialization went well.
+
+// So I know how to actually use the hash function
+//	md5 hasher;
+//	string data = "The quick brown fox jumps over the lazy dog", hash;
+//	hasher.update(data.begin(), data.end());
+//	hasher.hex_digest(hash);
+//
+//	cout << "Hash of " << data << " is " << hash << endl;
 	
 	Game game;
 	game.Setup();

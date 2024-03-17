@@ -10,12 +10,18 @@ using namespace std;
 // When looking through this code, one may encounter horrors beyond mortal comprehension, in Update() in particular - I am not liable for any harm caused by reading this code
 // Ye hast been warned
 
-
+/**
+ * Checks if the game is open
+ * @return true if the game is open, false otherwise
+ */
 bool Game::isOpen() const {
 	return open;
 }
 
 // This could be done in the constructor but whatever I don't care
+/**
+ * Initializes the game
+ */
 void Game::Setup() {
 	// Window setup
 	Window::init();
@@ -90,185 +96,9 @@ void Game::Setup() {
 	}
 }
 
-void Game::PlayingUpdate() {
-	lines.clear();
-	warnings.clear();
-	
-	player.Update();
-	
-	for (auto &w: waves) {
-		w.Update();
-	}
-	
-	for (uint64_t i = trash.size(); i--;) {
-		// Move the trash
-		trash[i].Update();
-		
-		//Trash pickup
-		if (isColliding(player, trash[i])) {
-			trash.erase(trash.begin() +
-			            (int64_t) i); // Yes that is how I cast to long I may or may not be chronically deranged
-			++Data::score;
-		}
-		for (auto & friendly : friendlies) {
-			if (isColliding(friendly, trash[i])) {
-				trash.erase(trash.begin() +
-				            (int64_t) i); // Yes that is how I cast to long I may or may not be chronically deranged
-				++Data::score;
-			}
-		}
-		// Lose points if trash goes of screen
-		if (trash[i].getRect().x > WindowData::SCREEN_WIDTH + 50) {
-			trash.erase(trash.begin() +
-			            (int64_t) i); // Yes that is how I cast to long I may or may not be chronically deranged
-			--Data::score;
-		}
-	}
-	
-	for (uint64_t i = enemies.size(); i--;) {
-		// Make the enemies take action
-		enemies[i].Update();
-		// Telegraphing
-		for (auto &other: enemies) {
-			// Warn the player if two enemies are colliding
-			if (isColliding(enemies[i], other) && enemies[i] != other && distance(enemies[i], player) < (double) Config::PLAYER_SIGHT_RANGE) {
-				GameObject warn;
-				warn.setPath("Assets/Exclamation.png");
-				warn.setRect({enemies[i].getRect().x + enemies[i].getRect().w / 2 - 20,
-				              enemies[i].getRect().y - 60, 30, 55});
-				warnings.push_back(warn); // Clang-Tidy: Use emplace_back instead of push_back (iont feel like it)
-			}
-			
-			if (other != enemies[i] && distance(player, enemies[i]) < Config::PLAYER_SIGHT_RANGE) {
-				if (distance(player, other) < Config::PLAYER_SIGHT_RANGE) {
-					lines.push_back(Line({enemies[i].getRect().x + enemies[i].getRect().w / 2,
-					                      enemies[i].getRect().y + enemies[i].getRect().h / 2},
-										  {other.getRect().x + other.getRect().w / 2,
-										   other.getRect().y + other.getRect().h / 2},
-										  (SDL_Color) {255, 0, 0, 255}, 3));
-				} else {
-					/*
-					std::pair <int, int> inter = line_circle_intersection(enemies[i].getRect().x + enemies[i].getRect().w / 2,
-					                                                      enemies[i].getRect().y + enemies[i].getRect().h / 2,
-					                                                      other.getRect().x + other.getRect().w / 2,
-					                                                      other.getRect().y + other.getRect().h / 2,
-					                                                      player.getRect().x + player.getRect().w / 2,
-					                                                      player.getRect().y + player.getRect().h / 2,
-					                                                       Config::PLAYER_SIGHT_RANGE);
-					if (inter.first != -1 && inter.second != -1) {
-						lines.push_back(Line({enemies[i].getRect().x + enemies[i].getRect().w / 2,
-						                      enemies[i].getRect().y + enemies[i].getRect().h / 2},
-						                     {inter.first, inter.second},
-						                     (SDL_Color) {255, 0, 0, 255}, 3));
-					}*/
-				}
-			}
-		}
-		
-		// Kill either the player or the enemy if they collide (rules in the README)
-		if (isColliding(player, enemies[i]) && player.getState() == Player::PlayerState::DISEMBARKED){
-			bool playerLoss = false;
-			for (auto &other: enemies) {
-				if (other != enemies[i] && sqrt(
-						pow(other.getRect().x - enemies[i].getRect().x, 2) +
-						pow(other.getRect().y - enemies[i].getRect().y, 2)) <
-				                           (double) Config::ENEMY_LINK_RANGE) {
-					playerLoss = true;
-					break;
-				}
-			}
-			if (!playerLoss) {
-				enemies.erase(enemies.begin() +
-				              (int64_t) i); // Yes that is how I cast to long I may or may not be chronically deranged
-				Data::score += 2;
-			} else {
-				Data::gameState = Data::GameState::GAME_OVER;
-				// Create the game over screen - it's not done in Setup() because WindowData::SCREEN_WIDTH and WindowData::SCREEN_HEIGHT are changed during gameplay
-				generateGameOverScreen();
-				
-				highscores.insert({username, Data::score}); // Since C++ file I/O is super slow (O(n)), I'll write to the file only when the game is closed (or maybe when the player exits to menu as well)
-				// Some math to make the text look not squished
-				// Game Over - 9 letters
-				// Press R to restart - 18 letters
-				// @ font size 100, Game over is 600 px w (and a w:h ratio of letter of  67 : 100)
-				// @ font size 100, Press R to restart would be 1200 px w (with same aspect ratio)
-				// lower the font size to 30 - both w and h would fall to 30% - 360 * 30, I believe
-			
-				// Note to self in the future: If you plan to change the text in the future, make sure to keep the 2:3 ratio
-				
-				// Another note at a later date: Apparently the standard ratio for monospace fonts is 1:2, not 2:3
-			}
-		}
-		
-	}
-	
-	for (uint64_t i = friendlies.size(); i--;) { // Yes that is how I make longs (I may or may not be chronically deranged)
-		// Move the friendlies
-		friendlies[i].Update();
-		
-		// Kill the friendly if the player collides with it
-		if (isColliding(player, friendlies[i])) {
-			friendlies.erase(friendlies.begin() +
-			                 (int64_t) i); // Yes that is how I cast to long I may or may not be chronically deranged
-			Data::score -= 2;
-		}
-	}
-	
-	texts.clear();
-	
-	// Disembark from the boat (text)
-	if (isColliding(player.getRect(), (SDL_Rect) {
-			WindowData::SCREEN_WIDTH / 3, 0,
-			WindowData::SCREEN_WIDTH / 6,
-			WindowData::SCREEN_HEIGHT})) {
-		Text embark(string("Press E to disembark"),
-					string("Assets/Fonts/VCR_OSD_MONO.ttf"),
-					30, (SDL_Color) {255, 255, 255, 255});
-		embark.setRect({WindowData::SCREEN_WIDTH / 2 - 400,
-		                WindowData::SCREEN_HEIGHT - 100,
-		               700, 50});
-		texts.push_back(embark); // Clang-Tidy: Use emplace_back instead of push_back (iont feel like it)
-		
-		delete disembark_indicator; // delete automatically checks if the pointer is nullptr - no worries there (I think - ChatGPT says it's been like that since C++98)
-		GameObject disembark_loc;
-		disembark_loc.setPath("Assets/Disembark-Indicator.png");
-		disembark_loc.setRect(
-				{WindowData::SCREEN_WIDTH / 3 - (player.getRect().x - WindowData::SCREEN_WIDTH / 3 + 80),
-				 player.getRect().y, 80, 115});
-		disembark_indicator = new GameObject(disembark_loc);
-//
-	} else {
-		if (disembark_indicator != nullptr) {
-			delete disembark_indicator;
-			disembark_indicator = nullptr;
-		}
-	}
-	
-	// Embark on the boat (text)
-	if (isColliding(player.getRect() + (SDL_Rect) {player.getRect().w, 0, 0, 0}, {
-			player.getBoatPosition().x - WindowData::SCREEN_WIDTH / 8,
-			player.getBoatPosition().y - 50,
-			player.getBoatPosition().w + WindowData::SCREEN_WIDTH / 4,
-			player.getBoatPosition().h + 100})) {
-		std::string str = "Press E to embark";
-		Text embark(str, string("Assets/Fonts/VCR_OSD_MONO.ttf"), 30, (SDL_Color) {255, 255, 255, 255});
-		embark.setRect({WindowData::SCREEN_WIDTH / 2 - 400, WindowData::SCREEN_HEIGHT - 100,
-		                595, 50});
-		texts.push_back(embark); // Clang-Tidy: Use emplace_back instead of push_back (iont feel like it)
-	}
-
-	// Write the score
-	Text score(string("Score: ") + std::to_string(Data::score),
-	           string("Assets/Fonts/VCR_OSD_MONO.ttf"),
-	           30, (SDL_Color) {255, 255, 255, 255});
-	score.setRect({10, 10, 200, 50});
-	texts.push_back(score); // Clang-Tidy: Use emplace_back instead of push_back (iont feel like it)
-	
-	if (enemies.empty() && trash.empty()) { // && friendlies.empty() if you want to be evil and make the player commit several federal crimes and be arrested on 91 criminal charges in order to complete the stage
-		CompleteStage();
-	}
-}
-
+/**
+ * @brief Increases difficulty and goes to next level
+ */
 void Game::CompleteStage() {
 
 	
@@ -347,6 +177,8 @@ void Game::CompleteStage() {
 	
 }
 
+/** Draws everything to the window
+ */
 void Game::Render(){
 	switch (Data::gameState) {
 		case Data::GameState::PLAYING:
@@ -455,6 +287,9 @@ void Game::Render(){
 	window.Flip();
 }
 
+/**
+ * @brief Restarts the game
+ */
 void Game::Restart() {
 	Window::setWindowSize(800, 600);
 	window.changeWindowSize(WindowData::SCREEN_WIDTH, WindowData::SCREEN_HEIGHT);
@@ -496,6 +331,9 @@ void Game::Restart() {
 	land.setRect({0, 0, WindowData::SCREEN_WIDTH / 3, WindowData::SCREEN_HEIGHT});
 }
 
+/**
+ * @brief Makes sure the window finds out if game should close
+ */
 void Game::CheckWindowEvents() {
 	window.checkQuit();
 	if (!window.isRunning()){
@@ -503,6 +341,9 @@ void Game::CheckWindowEvents() {
 	}
 }
 
+/**
+ * @brief Updates the game
+ */
 void Game::Update() {
 	switch (Data::gameState) {
 		case Data::GameState::PLAYING:
@@ -520,14 +361,205 @@ void Game::Update() {
 	}
 }
 
+/**
+ * @brief Updates the main menu screen
+ */
 void Game::MainMenuUpdate() {
 	mainMenuScreen.Update();
 }
 
+/**
+ * @brief Updates the game during play
+ */
+void Game::PlayingUpdate() {
+	lines.clear();
+	warnings.clear();
+	
+	player.Update();
+	
+	for (auto &w: waves) {
+		w.Update();
+	}
+	
+	for (uint64_t i = trash.size(); i--;) {
+		// Move the trash
+		trash[i].Update();
+		
+		//Trash pickup
+		if (isColliding(player, trash[i])) {
+			trash.erase(trash.begin() +
+			            (int64_t) i); // Yes that is how I cast to long I may or may not be chronically deranged
+			++Data::score;
+		}
+		for (auto & friendly : friendlies) {
+			if (isColliding(friendly, trash[i])) {
+				trash.erase(trash.begin() +
+				            (int64_t) i); // Yes that is how I cast to long I may or may not be chronically deranged
+				++Data::score;
+			}
+		}
+		// Lose points if trash goes of screen
+		if (trash[i].getRect().x > WindowData::SCREEN_WIDTH + 50) {
+			trash.erase(trash.begin() +
+			            (int64_t) i); // Yes that is how I cast to long I may or may not be chronically deranged
+			--Data::score;
+		}
+	}
+	
+	for (uint64_t i = enemies.size(); i--;) {
+		// Make the enemies take action
+		enemies[i].Update();
+		// Telegraphing
+		for (auto &other: enemies) {
+			// Warn the player if two enemies are colliding
+			if (isColliding(enemies[i], other) && enemies[i] != other && distance(enemies[i], player) < (double) Config::PLAYER_SIGHT_RANGE) {
+				GameObject warn;
+				warn.setPath("Assets/Exclamation.png");
+				warn.setRect({enemies[i].getRect().x + enemies[i].getRect().w / 2 - 20,
+				              enemies[i].getRect().y - 60, 30, 55});
+				warnings.push_back(warn); // Clang-Tidy: Use emplace_back instead of push_back (iont feel like it)
+			}
+			
+			if (other != enemies[i] && distance(player, enemies[i]) < Config::PLAYER_SIGHT_RANGE) {
+				if (distance(player, other) < Config::PLAYER_SIGHT_RANGE) {
+					lines.push_back(Line({enemies[i].getRect().x + enemies[i].getRect().w / 2,
+					                      enemies[i].getRect().y + enemies[i].getRect().h / 2},
+					                     {other.getRect().x + other.getRect().w / 2,
+					                      other.getRect().y + other.getRect().h / 2},
+					                     (SDL_Color) {255, 0, 0, 255}, 3));
+				} else {
+					/*
+					std::pair <int, int> inter = line_circle_intersection(enemies[i].getRect().x + enemies[i].getRect().w / 2,
+					                                                      enemies[i].getRect().y + enemies[i].getRect().h / 2,
+					                                                      other.getRect().x + other.getRect().w / 2,
+					                                                      other.getRect().y + other.getRect().h / 2,
+					                                                      player.getRect().x + player.getRect().w / 2,
+					                                                      player.getRect().y + player.getRect().h / 2,
+					                                                       Config::PLAYER_SIGHT_RANGE);
+					if (inter.first != -1 && inter.second != -1) {
+						lines.push_back(Line({enemies[i].getRect().x + enemies[i].getRect().w / 2,
+						                      enemies[i].getRect().y + enemies[i].getRect().h / 2},
+						                     {inter.first, inter.second},
+						                     (SDL_Color) {255, 0, 0, 255}, 3));
+					}*/
+				}
+			}
+		}
+		
+		// Kill either the player or the enemy if they collide (rules in the README)
+		if (isColliding(player, enemies[i]) && player.getState() == Player::PlayerState::DISEMBARKED){
+			bool playerLoss = false;
+			for (auto &other: enemies) {
+				if (other != enemies[i] && sqrt(
+						pow(other.getRect().x - enemies[i].getRect().x, 2) +
+						pow(other.getRect().y - enemies[i].getRect().y, 2)) <
+				                           (double) Config::ENEMY_LINK_RANGE) {
+					playerLoss = true;
+					break;
+				}
+			}
+			if (!playerLoss) {
+				enemies.erase(enemies.begin() +
+				              (int64_t) i); // Yes that is how I cast to long I may or may not be chronically deranged
+				Data::score += 2;
+			} else {
+				Data::gameState = Data::GameState::GAME_OVER;
+				// Create the game over screen - it's not done in Setup() because WindowData::SCREEN_WIDTH and WindowData::SCREEN_HEIGHT are changed during gameplay
+				generateGameOverScreen();
+				
+				highscores.insert({username, Data::score}); // Since C++ file I/O is super slow (O(n)), I'll write to the file only when the game is closed (or maybe when the player exits to menu as well)
+				// Some math to make the text look not squished
+				// Game Over - 9 letters
+				// Press R to restart - 18 letters
+				// @ font size 100, Game over is 600 px w (and a w:h ratio of letter of  67 : 100)
+				// @ font size 100, Press R to restart would be 1200 px w (with same aspect ratio)
+				// lower the font size to 30 - both w and h would fall to 30% - 360 * 30, I believe
+				
+				// Note to self in the future: If you plan to change the text in the future, make sure to keep the 2:3 ratio
+				
+				// Another note at a later date: Apparently the standard ratio for monospace fonts is 1:2, not 2:3
+			}
+		}
+		
+	}
+	
+	for (uint64_t i = friendlies.size(); i--;) { // Yes that is how I make longs (I may or may not be chronically deranged)
+		// Move the friendlies
+		friendlies[i].Update();
+		
+		// Kill the friendly if the player collides with it
+		if (isColliding(player, friendlies[i])) {
+			friendlies.erase(friendlies.begin() +
+			                 (int64_t) i); // Yes that is how I cast to long I may or may not be chronically deranged
+			Data::score -= 2;
+		}
+	}
+	
+	texts.clear();
+	
+	// Disembark from the boat (text)
+	if (isColliding(player.getRect(), (SDL_Rect) {
+			WindowData::SCREEN_WIDTH / 3, 0,
+			WindowData::SCREEN_WIDTH / 6,
+			WindowData::SCREEN_HEIGHT})) {
+		Text embark(string("Press E to disembark"),
+		            string("Assets/Fonts/VCR_OSD_MONO.ttf"),
+		            30, (SDL_Color) {255, 255, 255, 255});
+		embark.setRect({WindowData::SCREEN_WIDTH / 2 - 400,
+		                WindowData::SCREEN_HEIGHT - 100,
+		                700, 50});
+		texts.push_back(embark); // Clang-Tidy: Use emplace_back instead of push_back (iont feel like it)
+		
+		delete disembark_indicator; // delete automatically checks if the pointer is nullptr - no worries there (I think - ChatGPT says it's been like that since C++98)
+		GameObject disembark_loc;
+		disembark_loc.setPath("Assets/Disembark-Indicator.png");
+		disembark_loc.setRect(
+				{WindowData::SCREEN_WIDTH / 3 - (player.getRect().x - WindowData::SCREEN_WIDTH / 3 + 80),
+				 player.getRect().y, 80, 115});
+		disembark_indicator = new GameObject(disembark_loc);
+//
+	} else {
+		if (disembark_indicator != nullptr) {
+			delete disembark_indicator;
+			disembark_indicator = nullptr;
+		}
+	}
+	
+	// Embark on the boat (text)
+	if (isColliding(player.getRect() + (SDL_Rect) {player.getRect().w, 0, 0, 0}, {
+			player.getBoatPosition().x - WindowData::SCREEN_WIDTH / 8,
+			player.getBoatPosition().y - 50,
+			player.getBoatPosition().w + WindowData::SCREEN_WIDTH / 4,
+			player.getBoatPosition().h + 100})) {
+		std::string str = "Press E to embark";
+		Text embark(str, string("Assets/Fonts/VCR_OSD_MONO.ttf"), 30, (SDL_Color) {255, 255, 255, 255});
+		embark.setRect({WindowData::SCREEN_WIDTH / 2 - 400, WindowData::SCREEN_HEIGHT - 100,
+		                595, 50});
+		texts.push_back(embark); // Clang-Tidy: Use emplace_back instead of push_back (iont feel like it)
+	}
+	
+	// Write the score
+	Text score(string("Score: ") + std::to_string(Data::score),
+	           string("Assets/Fonts/VCR_OSD_MONO.ttf"),
+	           30, (SDL_Color) {255, 255, 255, 255});
+	score.setRect({10, 10, 200, 50});
+	texts.push_back(score); // Clang-Tidy: Use emplace_back instead of push_back (iont feel like it)
+	
+	if (enemies.empty() && trash.empty()) { // && friendlies.empty() if you want to be evil and make the player commit several federal crimes and be arrested on 91 criminal charges in order to complete the stage
+		CompleteStage();
+	}
+}
+
+/**
+ * @brief Updates the game over screen
+ */
 void Game::GameOverUpdate() {
 	gameOverScreen.Update();
 }
 
+/**
+ * @brief Updates the username screen
+ */
 void Game::UsernameUpdate() {
 	// I was going to have a class InputField, but it'd only be used once and oops it mysteriously disappeared when it didn't feel like working why would that be
 	if (Input::getKey("Return")){ // I'd use getKeyUp, but I can't be bothered to copy the entirety of the keyboard state to another variable, so I'll just use getKey
@@ -559,6 +591,10 @@ void Game::UsernameUpdate() {
 	usernameScreen.Update();
 }
 
+/**
+ * @brief Writes the highscores to the file
+ * @note The file is cleared before writing - use with caution
+ */
 void Game::writeHighscores() {
 	File scores(absolutePath("highscores.txt"));
 	scores.clearFile();
@@ -625,6 +661,10 @@ void Game::generateMainMenu() {
 	mainMenuScreen.addButton(quitButton);
 }
 
+/**
+ * @brief This function generates the game over screen
+ * @warning The function does not clear the game over screen, so it should be called only once
+ */
 void Game::generateGameOverScreen() {
 	gameOverScreen.setBackground("Assets/Game.png");
 	Text gameOverText("Game Over", "Assets/Fonts/VCR_OSD_MONO.ttf", 100, (SDL_Color) {255, 0, 0, 255});
@@ -662,6 +702,10 @@ void Game::generateGameOverScreen() {
 	gameOverScreen.addButton(menuButton);
 }
 
+/**
+ * @brief This function generates the username screen
+ * @warning The function does not clear the username screen, so it should be called only once
+ */
 void Game::generateUsernameScreen() {
 	usernameScreen.setBackground("Assets/MainMenu.png");
 	

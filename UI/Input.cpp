@@ -244,49 +244,93 @@ std::map<std::string, int> Input::mouseMap = {
 	{"right", SDL_BUTTON_RIGHT}
 };
 
+/**
+ * Maps a key to its SDL_Scancode
+ * @param key the key to be mapped
+ * @return the SDL_Scancode of the key
+ */
+[[maybe_unused]]
 SDL_Scancode Input::mapKey(const std::string &key) {
 	return keyMap[key];
 }
 
+/**
+ * Maps a mouse button to its SDL button code
+ * @param button the button to be mapped
+ * @return the SDL button code of the button
+ */
 [[maybe_unused]]
 int Input::mapMouseButton(const std::string &button) {
 	return mouseMap[button];
 }
 
+/**
+ * Returns whether a key is pressed
+ * @param key the key to be checked
+ * @return whether the key is pressed
+ */
 [[maybe_unused]]
 bool Input::getKey(const std::string &key) {
 	return keyState[mapKey(key)];
 }
 
+/**
+ * Returns whether a key was pressed this frame
+ * @param key the key to be checked
+ * @return whether the key was pressed this frame
+ */
 [[maybe_unused]]
 bool Input::getKeyDown(const std::string &key) {
 	return keyState[mapKey(key)] && !prevKeyState[mapKey(key)];
 }
 
+/**
+ * Returns whether a key was released this frame
+ * @param key the key to be checked
+ * @return whether the key was released this frame
+ */
 [[maybe_unused]]
 bool Input::getKeyUp(const std::string &key) {
 	return !keyState[mapKey(key)] && prevKeyState[mapKey(key)];
 }
 
+/**
+ * Returns whether a mouse button is pressed
+ * @param button the button to be checked
+ * @return whether the button is pressed
+ */
 [[maybe_unused]]
 bool Input::getMouseButton(const std::string& button) {
 	int buttonCode = mouseMap[button];
 	return mouseState & SDL_BUTTON(buttonCode);
 }
 
-
+/**
+ * Returns whether a mouse button was pressed this frame
+ * @param button the button to be checked
+ * @return whether the button was pressed this frame
+ */
 [[maybe_unused]]
 bool Input::getMouseButtonDown(const std::string &button) {
 	int buttonCode = mouseMap[button];
 	return (mouseState & SDL_BUTTON(buttonCode)) && !(prevMouseState & SDL_BUTTON(buttonCode));
 }
 
+/**
+ * Returns whether a mouse button was released this frame
+ * @param button the button to be checked
+ * @return whether the button was released this frame
+ */
 [[maybe_unused]]
 bool Input::getMouseButtonUp(const std::string &button) {
 	int buttonCode = mouseMap[button];
 	return !(mouseState & SDL_BUTTON(buttonCode)) && (prevMouseState & SDL_BUTTON(buttonCode));
 }
 
+/**
+ * Updates the input
+ * @warning This should be called once per frame as events can and will be lost
+ */
 void Input::Update() {
 	prevKeyState = keyState;
 	keyState = SDL_GetKeyboardState(nullptr);
@@ -301,14 +345,28 @@ void Input::Update() {
 	}
 }
 
+/**
+ * Returns the mouse position
+ * @return the mouse position
+ */
+[[maybe_unused]]
 std::pair<int, int> Input::getMousePosition() {
 	return {mouseX, mouseY};
 }
 
+/**
+ * Returns the current active events
+ * @return the current active events
+ */
+[[maybe_unused]]
 std::vector<SDL_Event>& Input::getEvents() {
 	return events;
 }
 
+/**
+ * Sets up the input
+ */
+[[maybe_unused]]
 void Input::Setup() {
 	SDL_StartTextInput();
 }

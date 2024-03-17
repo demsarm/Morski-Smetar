@@ -28,6 +28,11 @@ File::~File() {
 	fout.close();
 }
 
+/**
+ * Opens the file with the given modes
+ * @param write_mode the mode to open the file for writing
+ * @param read_mode the mode to open the file for reading
+ */
 void File::open(std::ios_base::openmode write_mode, std::ios_base::openmode read_mode) {
 	fin.close();
 	fout.close();
@@ -36,6 +41,11 @@ void File::open(std::ios_base::openmode write_mode, std::ios_base::openmode read
 	fout.open(path, write_mode);
 }
 
+/**
+ * Reads a line from the file
+ * @param includeNewline whether to include the newline character at the end of the line
+ * @return the line read
+ */
 std::string File::readLine(bool includeNewline) {
 	if (!fin.is_open()) {
 		std::cerr << "File " << path << " is not open for reading." << std::endl;
@@ -53,6 +63,11 @@ std::string File::readLine(bool includeNewline) {
 	return line;
 }
 
+/**
+ * Writes a string to the file
+ * @param data the string to be written
+ * @param newline whether to add a newline character at the end of the string
+ */
 void File::write(const std::string &data, bool newline) {
 	if (!fout.is_open()) {
 		return;
@@ -60,6 +75,11 @@ void File::write(const std::string &data, bool newline) {
 	fout << data << (newline ? "\n" : "");
 }
 
+/**
+ * Writes a string to the file
+ * @param data the string to be written
+ * @param newline whether to add a newline character at the end of the string
+ */
 lines File::readLines() {
 	lines lines;
 	std::string line;
@@ -69,6 +89,11 @@ lines File::readLines() {
 	return lines;
 }
 
+/**
+ * Writes a string to the file
+ * @param data the string to be written
+ * @param newline whether to add a newline character at the end of the string
+ */
 void File::clearFile() {
 	std::ofstream file;
 	file.open(path); // Opens the file in insert mode which by some leap of logic clears the file don't ask me about the leap in question
