@@ -31,7 +31,10 @@ class Game {
 	Window window = Window("Morski Smetar", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WindowData::SCREEN_WIDTH, WindowData::SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
 	
 	std::string username;
-	std::multimap<std::string, int> highscores;
+	struct Compare {
+		bool operator()(int a, int b) const { return a > b; }
+	};
+	std::multimap<int, std::string, Compare> highscores;
 	
 	Player player;
 	std::vector<Wave> waves;
@@ -48,12 +51,15 @@ class Game {
 	Screen gameOverScreen;
 	Screen mainMenuScreen;
 	Screen usernameScreen;
+	Screen leaderboardScreen;
+	
 	int backspaceCooldown = 0;
 	bool open = true;
 	
 	void generateMainMenu();
 	void generateGameOverScreen();
 	void generateUsernameScreen();
+	void generateLeaderboardScreen();
 public:
 	Game() = default;
 	[[nodiscard]] bool isOpen() const;
@@ -63,6 +69,7 @@ public:
 	void MainMenuUpdate();
 	void GameOverUpdate();
 	void UsernameUpdate();
+	void LeaderboardUpdate();
 	void CheckWindowEvents();
 	void Render(); // Having a separate fuction to render makes the code marginally cleaner, but may cause inefficiencies as some containers might be parsed multiple times (enemies, friendlies, waves & trash)
 	void CompleteStage();

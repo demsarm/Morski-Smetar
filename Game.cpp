@@ -1,3 +1,4 @@
+#include <iostream>
 #include "Game.h"
 #include "UI/Button.h"
 #include "Tools/File.h"
@@ -6,6 +7,8 @@
 #define LETTER_RATIO(h, len) (h * 2 / 3 * len)
 
 using namespace std;
+
+
 
 // When looking through this code, one may encounter horrors beyond mortal comprehension, in Update() in particular - I am not liable for any harm caused by reading this code
 // Ye hast been warned
@@ -27,9 +30,6 @@ void Game::Setup() {
 	Window::init();
 	Window::setWindowSize(800, 600);
 	open = true;
-	
-	generateMainMenu();
-	generateUsernameScreen();
 	
 	window.Raise();
 	
@@ -85,15 +85,20 @@ void Game::Setup() {
 	const std::vector<std::string> namesList = {"Anita Bath", "Al Beback", "Barry D'Alive", "Justin Thyme", "Sue Permann", "Dee Zaster", "Polly Ester", "Sal Monella", "Bill Board", "Barb D. Wyer", "Max Power", "Skel Etal", "Lou Scannon", "Pete Sariya", "Vlad"};
 	username = namesList[Random::randint((int)(namesList.size()))]; // It should be fine to convert to string here, the list probably won't ever be longer than 2^31 - 1 (I mean how would you even get that many names?)
 	
-	// TODO the highscores file gets wiped for whatever reason GOD I HATE C++
 	// Load the highscores
 	File scores(absolutePath("highscores.txt"));
 	std::string name = scores.readLine(); // I'd use do-while but our lord and savior Clang-Tidy says do-while is not good for whatever reason
 	while (!name.empty()) {
 		int space = (int)(name.find_last_of(' ')); // TODO: Remember to put character limit on username
-		highscores.insert({name.substr(0, space), std::stoi(name.substr(space + 1))}); // By Jove, I hope stoi works like it should I have so many negative experiences with it
+		int score = std::stoi(name.substr(0, space));
+		highscores.insert({score, name.substr(space + 1)}); // By Jove, I hope stoi works like it should I have so many negative experiences with it
 		name = scores.readLine();
 	}
+	
+	// These have to be made post highscore loading because the highscores are used in the leaderboard screen (and I don't want them scattered willy-nilly)
+	generateMainMenu();
+	generateUsernameScreen();
+	generateLeaderboardScreen();
 }
 
 /**
@@ -283,6 +288,9 @@ void Game::Render(){
 		case Data::GameState::USERNAME:
 			window.Draw(usernameScreen);
 			break;
+		case Data::GameState::LEADERBOARD:
+			window.Draw(leaderboardScreen);
+			break;
 	}
 	window.Flip();
 }
@@ -357,6 +365,9 @@ void Game::Update() {
 			break;
 		case Data::GameState::USERNAME:
 			UsernameUpdate();
+			break;
+		case Data::GameState::LEADERBOARD:
+			LeaderboardUpdate();
 			break;
 	}
 }
@@ -467,7 +478,7 @@ void Game::PlayingUpdate() {
 				// Create the game over screen - it's not done in Setup() because WindowData::SCREEN_WIDTH and WindowData::SCREEN_HEIGHT are changed during gameplay
 				generateGameOverScreen();
 				
-				highscores.insert({username, Data::score}); // Since C++ file I/O is super slow (O(n)), I'll write to the file only when the game is closed (or maybe when the player exits to menu as well)
+				highscores.insert({Data::score, username}); // Since C++ file I/O is super slow (O(n)), I'll write to the file only when the game is closed (or maybe when the player exits to menu as well)
 				// Some math to make the text look not squished
 				// Game Over - 9 letters
 				// Press R to restart - 18 letters
@@ -576,7 +587,7 @@ void Game::UsernameUpdate() {
 		if (!username.empty()){
 			username.pop_back();
 		}
-		backspaceCooldown = 20; // So it doesn't evaporate the entire string in 7.34 frames, but ten should still be low enough to not be annoying
+		backspaceCooldown = 20; // So it doesn't evaporate the entire string in 7.34 frames, but twenty should still be low enough to not be annoying
 	}
 	for (auto &event : Input::getEvents()){
 		switch (event.type){
@@ -592,6 +603,13 @@ void Game::UsernameUpdate() {
 }
 
 /**
+ * @brief Updates the leaderboard screen
+ */
+void Game::LeaderboardUpdate() {
+	leaderboardScreen.Update();
+}
+
+/**
  * @brief Writes the highscores to the file
  * @note The file is cleared before writing - use with caution
  */
@@ -600,7 +618,7 @@ void Game::writeHighscores() {
 	scores.clearFile();
 	auto it = highscores.begin();
 	for (int i = 5; i-- && it != highscores.end(); it++) {
-		scores.write(it->first + " " + std::to_string(it->second));
+		scores.write(std::to_string(it->first) + " " + it->second);
 	}
 }
 
@@ -614,18 +632,21 @@ void Game::generateMainMenu() {
 	
 	
 	SDL_Rect startRect = {twelfth_x, twelfth_y * 3, LETTER_RATIO(twelfth_y, 5), twelfth_y};
-	SDL_Rect usernameRect = {twelfth_x, (int)(twelfth_y * 4.5), LETTER_RATIO(twelfth_y, 5), twelfth_y};
-	SDL_Rect quitRect = {twelfth_x, (int)(twelfth_y * 6), LETTER_RATIO(twelfth_y, 4), twelfth_y};
+	SDL_Rect usernameRect = {twelfth_x, (int)(twelfth_y * 4.5), LETTER_RATIO(twelfth_y, 12), twelfth_y};
+	SDL_Rect leaderboardRect = {twelfth_x, (int)(twelfth_y * 6), LETTER_RATIO(twelfth_y, 11), twelfth_y};
+	SDL_Rect quitRect = {twelfth_x, (int)(twelfth_y * 7.5), LETTER_RATIO(twelfth_y, 4), twelfth_y};
 	
 	mainMenuScreen.setBackground("Assets/MainMenu.png");
-	Text gameText("Morski Smetar", "Assets/Fonts/VCR_OSD_MONO.ttf", 100, (SDL_Color) {0xc0, 0xc0, 0xc0, 255}); // I came up with 0xc0 on the fly, can't be bothered to convert to decimal
-	Text usernameText("Set username", "Assets/Fonts/VCR_OSD_MONO.ttf", 50, (SDL_Color) {0xc0, 0xc0, 0xc0, 255});
-	Text startText("Start", "Assets/Fonts/VCR_OSD_MONO.ttf", 50, (SDL_Color) {0xc0, 0xc0, 0xc0, 255});
-	Text quitText("Quit", "Assets/Fonts/VCR_OSD_MONO.ttf", 50, (SDL_Color) {0xc0, 0xc0, 0xc0, 255});
+	Text gameText("Morski Smetar", "Assets/Fonts/VCR_OSD_MONO.ttf", 100, Config::TEXT_COLOR);
+	Text startText("Start", "Assets/Fonts/VCR_OSD_MONO.ttf", 50, Config::BUTTON_COLOR);
+	Text usernameText("Set username", "Assets/Fonts/VCR_OSD_MONO.ttf", 50, Config::BUTTON_COLOR);
+	Text leaderboardText("Leaderboard", "Assets/Fonts/VCR_OSD_MONO.ttf", 50, Config::BUTTON_COLOR);
+	Text quitText("Quit", "Assets/Fonts/VCR_OSD_MONO.ttf", 50, Config::BUTTON_COLOR);
 	
 	gameText.setRect({twelfth_x, twelfth_y, LETTER_RATIO((int)(twelfth_y * 1.5), 13), (int)(twelfth_y * 1.5)});
 	startText.setRect(startRect + (SDL_Rect){20, 5, -40, -10}); // Slightly smaller than the button size
 	usernameText.setRect(usernameRect + (SDL_Rect){20, 5, -40, -10});
+	leaderboardText.setRect(leaderboardRect + (SDL_Rect){20, 5, -40, -10});
 	quitText.setRect(quitRect + (SDL_Rect){20, 5, -40, -10});
 
 	Button startButton(
@@ -646,6 +667,15 @@ void Game::generateMainMenu() {
 			[](){Data::gameState = Data::GameState::USERNAME;}
 	);
 	
+	Button leaderboardButton(
+			leaderboardRect,
+			leaderboardText,
+			"Assets/Empty.png",
+			"Assets/Empty.png",
+			"Assets/Empty.png",
+			[](){Data::gameState = Data::GameState::LEADERBOARD;}
+	);
+	
 	Button quitButton(
 			quitRect,
 			quitText,
@@ -658,6 +688,7 @@ void Game::generateMainMenu() {
 	mainMenuScreen.addText(gameText);
 	mainMenuScreen.addButton(startButton);
 	mainMenuScreen.addButton(usernameButton);
+	mainMenuScreen.addButton(leaderboardButton);
 	mainMenuScreen.addButton(quitButton);
 }
 
@@ -694,7 +725,10 @@ void Game::generateGameOverScreen() {
 	                  "Assets/Empty.png",
 	                  "Assets/Empty.png",
 	                  "Assets/Empty.png",
-	                  [](){Data::gameState = Data::GameState::MAIN_MENU;}
+	                  [this](){
+						this->generateLeaderboardScreen(); // You could also do this on every death, but I find it's a little wasteful when you restart a lot
+						Data::gameState = Data::GameState::MAIN_MENU;
+						}
 	);
 	
 	
@@ -710,12 +744,12 @@ void Game::generateUsernameScreen() {
 	usernameScreen.setBackground("Assets/MainMenu.png");
 	
 	SDL_Rect usernameRect = {WindowData::SCREEN_WIDTH / 2 - 200, WindowData::SCREEN_HEIGHT / 2 - 50, LETTER_RATIO(30, (int)username.size()), 30};
-	Text usernameText(username, "Assets/Fonts/VCR_OSD_MONO.ttf", 30, (SDL_Color) {0xc0, 0xc0, 0xc0, 255});
+	Text usernameText(username, "Assets/Fonts/VCR_OSD_MONO.ttf", 30, Config::TEXT_COLOR);
 	usernameText.setRect(usernameRect);
 	usernameScreen.addText(usernameText); // So it should be at index [0], this is important for the update function
 	
 	SDL_Rect submitRect = {WindowData::SCREEN_WIDTH / 2 - 70, WindowData::SCREEN_HEIGHT / 2 + 100, 140, 30};
-	Text submitText("Submit", "Assets/Fonts/VCR_OSD_MONO.ttf", 30, (SDL_Color) {0xc0, 0xc0, 0xc0, 255});
+	Text submitText("Submit", "Assets/Fonts/VCR_OSD_MONO.ttf", 30, Config::BUTTON_COLOR);
 	submitText.setRect(submitRect);
 	Button submitButton(submitRect + (SDL_Rect){-20, -20, 40, 40},
 	                    submitText,
@@ -729,6 +763,56 @@ void Game::generateUsernameScreen() {
 	
 	usernameScreen.addButton(submitButton);
 	
+}
+
+/**
+ * @brief This function generates the leaderboard screen
+ * @note Unlike the other generate functions, this function does clear the leaderboard screen
+ */
+void Game::generateLeaderboardScreen() {
+	const int twelfth_x = WindowData::SCREEN_WIDTH / 12;
+	const int twelfth_y = WindowData::SCREEN_HEIGHT / 12;
+	
+	leaderboardScreen.clearButtons();
+	leaderboardScreen.clearTexts();
+	
+	leaderboardScreen.setBackground("Assets/MainMenu.png");
+	std::string tmp = "Highest Scores";
+	Text leaderboardText(tmp, "Assets/Fonts/VCR_OSD_MONO.ttf", 50, Config::TEXT_COLOR);
+	SDL_Rect leaderboardRect = {twelfth_x, twelfth_y, LETTER_RATIO((int)(twelfth_y * 1.5), 13), (int)(twelfth_y * 1.5)};
+	leaderboardText.setRect(leaderboardRect);
+	leaderboardScreen.addText(leaderboardText);
+	
+	vector<pair<int, string>> top5;
+	for (auto it = highscores.begin(); it != highscores.end() && top5.size() < 5; ++it) {
+		top5.push_back(*it);
+	}
+	
+	std::string temp = top5[0].second + (std::string(" ") * (20 - (int)top5[0].second.size())) + std::to_string(top5[0].first); // this is just to get the length of the string
+	SDL_Rect scoreRect = {twelfth_x, (int)(twelfth_y * 3), LETTER_RATIO(35, (int)temp.length()), 35};
+	for (auto& score : top5) {
+		temp = score.second + (std::string(" ") * (20 - (int)score.second.size())) + std::to_string(score.first);
+		Text scoreText(temp, "Assets/Fonts/VCR_OSD_MONO.ttf", 30, Config::TEXT_COLOR);
+		scoreText.setRect(scoreRect);
+		leaderboardScreen.addText(scoreText);
+		scoreRect.y += 75;
+	}
+	
+	tmp = "Back";
+	Text backText(tmp, "Assets/Fonts/VCR_OSD_MONO.ttf", 30, Config::BUTTON_COLOR);
+	SDL_Rect backRect = {twelfth_x, WindowData::SCREEN_HEIGHT - 2 * twelfth_y, LETTER_RATIO(50, (int)tmp.size()), 50};
+	backText.setRect(backRect);
+	
+	Button backButton(backRect + (SDL_Rect){-20, -20, 40, 40},
+	                  backText,
+	                  "Assets/Empty.png",
+	                  "Assets/Empty.png",
+	                  "Assets/Empty.png",
+	                  [](){
+	                      Data::gameState = Data::GameState::MAIN_MENU;
+	                  }
+	);
+	leaderboardScreen.addButton(backButton);
 }
 
 // This comment is just a rant, it's not important nor is it relevant to the code

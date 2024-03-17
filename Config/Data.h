@@ -8,7 +8,8 @@ namespace Data {
 		MAIN_MENU,
 		PLAYING,
 		GAME_OVER,
-		USERNAME // Username input screen
+		USERNAME, // Username input screen
+		LEADERBOARD
 	};
 
 	extern int score;
