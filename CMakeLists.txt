@@ -3,6 +3,10 @@ project(Morski_Smetar)
 
 link_directories(/usr/lib)
 
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+    add_definitions(-DDEBUG)
+endif()
+
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
 find_package(SDL2_ttf REQUIRED)
@@ -40,8 +44,6 @@ add_executable(Morski_Smetar main.cpp
         Tools/Math.h
         Entities/Friendly.cpp
         Entities/Friendly.h
-        Game.cpp
-        Game.h
         UI/Line.cpp
         UI/Line.h
         UI/Screen.cpp
@@ -52,6 +54,16 @@ add_executable(Morski_Smetar main.cpp
         UI/Input.h
         UI/Button.cpp
         UI/Button.h
+        Tools/MD5.cpp
+        Tools/MD5.h
+        Tools/BinaryFile.cpp
+        Tools/BinaryFile.h
+        Recording/Recorder.cpp
+        Recording/Recorder.h
+        Game.cpp
+        Game.h
+        Recording/Reader.cpp
+        Recording/Reader.h
 )
 
 target_link_libraries(Morski_Smetar SDL2)

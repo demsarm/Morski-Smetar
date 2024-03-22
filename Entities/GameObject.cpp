@@ -15,7 +15,7 @@ GameObject::GameObject() {
 [[maybe_unused]] GameObject::GameObject(const GameObject &other) {
 	rect = other.rect;
 	design = other.design;
-};
+}
 
 /**
  * @brief Destructor for GameObject
@@ -76,4 +76,11 @@ void GameObject::setRect(const SDL_Rect& rect1) {
 /**
  * Does nothing by default - to be overridden by child classes
  */
-void GameObject::Update() { }
+void GameObject::Update() {
+	if (rect.x < 0) { // Force the object's position to be non-negative - it's a bad solution, however, since I am on a time limit, I can't waste time finding out why the object's position is -3 on 7 frames
+		rect.x = 0;
+	}
+	if (rect.y < 0) {
+		rect.y = 0;
+	}
+}

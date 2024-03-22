@@ -9,7 +9,9 @@ namespace Data {
 		PLAYING,
 		GAME_OVER,
 		USERNAME, // Username input screen
-		LEADERBOARD
+		LEADERBOARD,
+		PLAYBACK, // Viewing replay
+		PLAYBACK_END
 	};
 
 	extern int score;

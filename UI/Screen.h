@@ -13,7 +13,6 @@
 
 class Screen {
 	std::string background;
-	// TODO: Make everything on a screen an std::vector<GameObject *> so that we can have buttons and stuff
 	std::vector<Text> texts;
 	std::vector<Button> buttons;
 public:

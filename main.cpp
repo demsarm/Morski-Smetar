@@ -4,6 +4,10 @@
 #include "Game.h"
 #include "UI/Input.h"
 
+#ifdef DEBUG
+#include "Tools/filesystem.h"
+#endif
+
 using namespace std;
 
 #ifdef _WIN32
@@ -20,7 +24,18 @@ int main() {
 //	hasher.hex_digest(hash);
 //
 //	cout << "Hash of " << data << " is " << hash << endl;
-	
+
+#ifdef DEBUG
+	freopen(absolutePath("debug.txt").c_str(), "w", stdout);
+	freopen(absolutePath("debug.txt").c_str(), "w", stderr);
+#elif __linux__
+	freopen("/dev/tty", "w", stdout);
+	freopen("/dev/tty", "w", stderr);
+#else
+	freopen("CON", "w", stdout);
+	freopen("CON", "w", stderr);
+#endif
+
 	Game game;
 	game.Setup();
 	// Game loop

@@ -7,8 +7,8 @@
  * @brief Default constructor for the Trash class
  */
 Trash::Trash() : GameObject() {
-	type = Random::randint(0, 3);
-	design.path =trash_types[type];
+	type = (Type)Random::randint(0, 3);
+	design.path = trash_types[(int)type];
 	
 	initial_y = rect.y;
 	offset = Random::randint(0, 50);
@@ -21,8 +21,8 @@ Trash::Trash() : GameObject() {
  */
 Trash::Trash(int x, int y) : GameObject() {
 	rect = {x, y, 50, 50};
-	type = Random::randint(0, 3);
-	design.path = trash_types[type];
+	type = (Type)Random::randint(0, 3);
+	design.path = trash_types[(int)type];
 	
 	initial_y = rect.y;
 	offset = Random::randint(0, 50);
@@ -49,6 +49,6 @@ void Trash::Update() {
  * @brief Returns the type of the Trash object
  * @return the type of the Trash object
  */
-[[maybe_unused]] uint8_t Trash::getType() const {
+[[maybe_unused]] Trash::Type Trash::getType() const {
 	return type;
 }

@@ -228,7 +228,7 @@ void Window::DrawBackground(const std::string &texture_path) {
 	SDL_Texture * texture = IMG_LoadTexture(renderer, absolutePath(texture_path).c_str());
 	SDL_RenderCopy(renderer, texture, nullptr, nullptr);
 	SDL_DestroyTexture(texture);
-	// TODO make this look less goofy when aspect ratios don't match
+	// Make it less goofy when aspect ratios don't match if you ever feel like it
 }
 
 /**

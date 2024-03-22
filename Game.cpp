@@ -35,8 +35,10 @@ void Game::Setup() {
 	
 	Input::Setup();
 	
-//	Window test("Test", 100, 100, WindowData::SCREEN_WIDTH, WindowData::SCREEN_HEIGHT, 0);
-//	window = Window("Morski Smetar", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WindowData::SCREEN_WIDTH, WindowData::SCREEN_HEIGHT, 0);
+	recorder.open(absolutePath("recording.bin"));
+	
+	reader.open(absolutePath("recording.bin"));
+	playback_objs.clear();
 	
 	// Player setup
 	player.setPath("Assets/Boat.png");
@@ -78,18 +80,23 @@ void Game::Setup() {
 	
 	// Let there be land
 	// TODO: Make the land look nicer, be it with textures or something like the waves on the water
-	land.setColor((SDL_Color) {220, 220, 120, 255});
+//	land.setColor((SDL_Color) {220, 220, 120, 255});
 	land.setRect({0, 0, WindowData::SCREEN_WIDTH / 3, WindowData::SCREEN_HEIGHT});
+	land.setPath("Assets/Sand.png");
 	
 	// Need them names for score keeping, and I'm not going to force the player to input their name
 	const std::vector<std::string> namesList = {"Anita Bath", "Al Beback", "Barry D'Alive", "Justin Thyme", "Sue Permann", "Dee Zaster", "Polly Ester", "Sal Monella", "Bill Board", "Barb D. Wyer", "Max Power", "Skel Etal", "Lou Scannon", "Pete Sariya", "Vlad"};
 	username = namesList[Random::randint((int)(namesList.size()))]; // It should be fine to convert to string here, the list probably won't ever be longer than 2^31 - 1 (I mean how would you even get that many names?)
 	
+	// I am so tempted to give a 0.01% chance of the player name being "My beautiful baby, Independence day".
+	// Though admittedly, that would break the leaderboard (making it take about forever to generate)
+	// or about as long as it takes your computer to join 2^31-15 spaces together into a string (taking up around 4 gigs of RAM just for the string), colloquially referred to as "a long time"
+	
 	// Load the highscores
 	File scores(absolutePath("highscores.txt"));
 	std::string name = scores.readLine(); // I'd use do-while but our lord and savior Clang-Tidy says do-while is not good for whatever reason
 	while (!name.empty()) {
-		int space = (int)(name.find_last_of(' ')); // TODO: Remember to put character limit on username
+		int space = (int)(name.find_first_of(' '));
 		int score = std::stoi(name.substr(0, space));
 		highscores.insert({score, name.substr(space + 1)}); // By Jove, I hope stoi works like it should I have so many negative experiences with it
 		name = scores.readLine();
@@ -105,7 +112,7 @@ void Game::Setup() {
  * @brief Increases difficulty and goes to next level
  */
 void Game::CompleteStage() {
-
+	Data::score += 5 * Data::difficulty; // To give incentive to complete the stage instead of just picking up trash
 	
 	++Data::difficulty;
 	
@@ -279,6 +286,20 @@ void Game::Render(){
 				window.Draw(*disembark_indicator, 0.0, player.isFacingRight() ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL);
 			}
 			break;
+		case Data::GameState::PLAYBACK: // TODO Test this
+			window.Clear((SDL_Color) {50, 210, 255, 255});
+			
+			for (const auto& wave : waves){
+				window.Draw(wave);
+			}
+			
+			window.Draw(land);
+
+			for (auto& go : playback_objs){
+				window.Draw(go);
+			}
+			
+			break;
 		case Data::GameState::GAME_OVER:
 			window.Draw(gameOverScreen);
 			break;
@@ -291,6 +312,9 @@ void Game::Render(){
 		case Data::GameState::LEADERBOARD:
 			window.Draw(leaderboardScreen);
 			break;
+		case Data::GameState::PLAYBACK_END:
+			window.Draw(playbackEndScreen);
+			break;
 	}
 	window.Flip();
 }
@@ -299,6 +323,7 @@ void Game::Render(){
  * @brief Restarts the game
  */
 void Game::Restart() {
+	recorder.clearFile();
 	Window::setWindowSize(800, 600);
 	window.changeWindowSize(WindowData::SCREEN_WIDTH, WindowData::SCREEN_HEIGHT);
 	
@@ -369,6 +394,12 @@ void Game::Update() {
 		case Data::GameState::LEADERBOARD:
 			LeaderboardUpdate();
 			break;
+		case Data::GameState::PLAYBACK:
+			PlaybackUpdate();
+			break;
+		case Data::GameState::PLAYBACK_END:
+			PlaybackEndUpdate();
+			break;
 	}
 }
 
@@ -387,6 +418,7 @@ void Game::PlayingUpdate() {
 	warnings.clear();
 	
 	player.Update();
+	player.GameObject::Update();
 	
 	for (auto &w: waves) {
 		w.Update();
@@ -395,6 +427,7 @@ void Game::PlayingUpdate() {
 	for (uint64_t i = trash.size(); i--;) {
 		// Move the trash
 		trash[i].Update();
+		trash[i].GameObject::Update();
 		
 		//Trash pickup
 		if (isColliding(player, trash[i])) {
@@ -420,6 +453,7 @@ void Game::PlayingUpdate() {
 	for (uint64_t i = enemies.size(); i--;) {
 		// Make the enemies take action
 		enemies[i].Update();
+		enemies[i].GameObject::Update();
 		// Telegraphing
 		for (auto &other: enemies) {
 			// Warn the player if two enemies are colliding
@@ -497,6 +531,7 @@ void Game::PlayingUpdate() {
 	for (uint64_t i = friendlies.size(); i--;) { // Yes that is how I make longs (I may or may not be chronically deranged)
 		// Move the friendlies
 		friendlies[i].Update();
+		friendlies[i].GameObject::Update();
 		
 		// Kill the friendly if the player collides with it
 		if (isColliding(player, friendlies[i])) {
@@ -555,9 +590,18 @@ void Game::PlayingUpdate() {
 	           30, (SDL_Color) {255, 255, 255, 255});
 	score.setRect({10, 10, 200, 50});
 	texts.push_back(score); // Clang-Tidy: Use emplace_back instead of push_back (iont feel like it)
+
+#ifdef DEBUG
+	if (player.getRect().x < 0 || player.getRect().y < 0) {
+		std::cerr << "Player in invalid position: " << player.getRect().x << ", " << player.getRect().y << std::endl;
+	}
+#endif
+
+	recorder.Update(player, enemies, friendlies, trash);
 	
 	if (enemies.empty() && trash.empty()) { // && friendlies.empty() if you want to be evil and make the player commit several federal crimes and be arrested on 91 criminal charges in order to complete the stage
 		CompleteStage();
+		recorder.Write(Recorder::Type::COMPLETE_STAGE, WindowData::SCREEN_WIDTH, WindowData::SCREEN_HEIGHT);
 	}
 }
 
@@ -610,6 +654,94 @@ void Game::LeaderboardUpdate() {
 }
 
 /**
+ * @brief Updates the game during playback
+ */
+void Game::PlaybackUpdate() {
+	reader.Scan();
+	playback_objs.clear();
+	bool exit = true;
+	
+	for (auto& wave : waves) {
+		wave.Update();
+	}
+	
+	while (exit) {
+		Reader::Record record = reader.Next();
+		GameObject buff;
+		switch (record.type) {
+			case Reader::Type::RESET:
+				exit = false;
+				break;
+			case Reader::Type::PLAYER:
+				if (record.x < WindowData::SCREEN_WIDTH / 3) {
+					buff.setPath("Assets/Player.png");
+					buff.setRect({(int)record.x, (int)record.y, 80, 115});
+				} else {
+					buff.setPath("Assets/Boat.png");
+					buff.setRect({(int)record.x, (int)record.y, 160, 115});
+				}
+				break;
+			case Reader::Type::ENEMY:
+				buff.setPath("Assets/Enemy.png");
+				buff.setRect({(int)record.x, (int)record.y, 60, 65});
+				break;
+			case Reader::Type::FRIENDLY_LAND:
+				buff.setPath("Assets/Tractor.png");
+				buff.setRect({(int)record.x, (int)record.y, 70, 60});
+				break;
+			case Reader::Type::FRIENDLY_WATER:
+				buff.setPath("Assets/Fishing-Boat.png");
+				buff.setRect({(int)record.x, (int)record.y, 70, 60});
+				break;
+			case Reader::Type::TRASH_BOTTLE:
+				buff.setPath("Assets/Bottle.png");
+				buff.setRect({(int)record.x, (int)record.y, 50, 50});
+				break;
+			case Reader::Type::TRASH_CAN:
+				buff.setPath("Assets/Trash-Can.png");
+				buff.setRect({(int)record.x, (int)record.y, 50, 50});
+				break;
+			case Reader::Type::TRASH_BOX:
+				buff.setPath("Assets/Trash-Box.png");
+				buff.setRect({(int)record.x, (int)record.y, 50, 50});
+				break;
+			case Reader::Type::COMPLETE_STAGE:
+				Window::setWindowSize((int)record.x, (int)record.y); // I should arguably make the function take an uint to prevent negative window sizes, but eh who cares
+				window.changeWindowSize(WindowData::SCREEN_WIDTH, WindowData::SCREEN_HEIGHT);
+				window.centerWindow();
+				
+				land.setRect({0, 0, WindowData::SCREEN_WIDTH / 3, WindowData::SCREEN_HEIGHT});
+				
+				break;
+			case Reader::Type::PLAYER_BOAT:
+				buff.setPath("Assets/Boat.png");
+				buff.setRect({(int)record.x, (int)record.y, 160, 115});
+				break;
+			default:
+				cerr << "Oops, something went wrong (BAD_TYPE: " << (unsigned)record.type << ")\n" << endl;
+				exit = false;
+				break;
+		}
+		playback_objs.push_back(buff);
+		
+	}
+	
+	if (reader.eof()) {
+		generatePlaybackEndScreen();
+		Data::gameState = Data::GameState::PLAYBACK_END;
+	}
+	
+	if (Input::getKey("Escape")){
+		playback_objs.clear();
+		Data::gameState = Data::GameState::MAIN_MENU;
+	}
+}
+
+void Game::PlaybackEndUpdate() {
+	playbackEndScreen.Update();
+}
+
+/**
  * @brief Writes the highscores to the file
  * @note The file is cleared before writing - use with caution
  */
@@ -630,23 +762,26 @@ void Game::generateMainMenu() {
 	const int twelfth_x = WindowData::SCREEN_WIDTH / 12;
 	const int twelfth_y = WindowData::SCREEN_HEIGHT / 12;
 	
+	mainMenuScreen.setBackground("Assets/MainMenu.png");
 	
 	SDL_Rect startRect = {twelfth_x, twelfth_y * 3, LETTER_RATIO(twelfth_y, 5), twelfth_y};
 	SDL_Rect usernameRect = {twelfth_x, (int)(twelfth_y * 4.5), LETTER_RATIO(twelfth_y, 12), twelfth_y};
 	SDL_Rect leaderboardRect = {twelfth_x, (int)(twelfth_y * 6), LETTER_RATIO(twelfth_y, 11), twelfth_y};
-	SDL_Rect quitRect = {twelfth_x, (int)(twelfth_y * 7.5), LETTER_RATIO(twelfth_y, 4), twelfth_y};
+	SDL_Rect playbackRect = {twelfth_x, (int)(twelfth_y * 7.5), LETTER_RATIO(twelfth_y, 8), twelfth_y};
+	SDL_Rect quitRect = {twelfth_x, (int)(twelfth_y * 9), LETTER_RATIO(twelfth_y, 4), twelfth_y};
 	
-	mainMenuScreen.setBackground("Assets/MainMenu.png");
 	Text gameText("Morski Smetar", "Assets/Fonts/VCR_OSD_MONO.ttf", 100, Config::TEXT_COLOR);
 	Text startText("Start", "Assets/Fonts/VCR_OSD_MONO.ttf", 50, Config::BUTTON_COLOR);
 	Text usernameText("Set username", "Assets/Fonts/VCR_OSD_MONO.ttf", 50, Config::BUTTON_COLOR);
 	Text leaderboardText("Leaderboard", "Assets/Fonts/VCR_OSD_MONO.ttf", 50, Config::BUTTON_COLOR);
+	Text playbackText("Playback", "Assets/Fonts/VCR_OSD_MONO.ttf", 50, Config::BUTTON_COLOR);
 	Text quitText("Quit", "Assets/Fonts/VCR_OSD_MONO.ttf", 50, Config::BUTTON_COLOR);
 	
 	gameText.setRect({twelfth_x, twelfth_y, LETTER_RATIO((int)(twelfth_y * 1.5), 13), (int)(twelfth_y * 1.5)});
 	startText.setRect(startRect + (SDL_Rect){20, 5, -40, -10}); // Slightly smaller than the button size
 	usernameText.setRect(usernameRect + (SDL_Rect){20, 5, -40, -10});
 	leaderboardText.setRect(leaderboardRect + (SDL_Rect){20, 5, -40, -10});
+	playbackText.setRect(playbackRect + (SDL_Rect){20, 5, -40, -10});
 	quitText.setRect(quitRect + (SDL_Rect){20, 5, -40, -10});
 
 	Button startButton(
@@ -655,7 +790,10 @@ void Game::generateMainMenu() {
 			"Assets/Empty.png",
 			"Assets/Empty.png",
 			"Assets/Empty.png",
-			[](){Data::gameState = Data::GameState::PLAYING;}
+			[this](){
+				this->Restart();
+				Data::gameState = Data::GameState::PLAYING;
+			}
 	);
 	
 	Button usernameButton(
@@ -676,6 +814,15 @@ void Game::generateMainMenu() {
 			[](){Data::gameState = Data::GameState::LEADERBOARD;}
 	);
 	
+	Button playbackButton(
+			playbackRect,
+			playbackText,
+			"Assets/Empty.png",
+			"Assets/Empty.png",
+			"Assets/Empty.png",
+			[](){Data::gameState = Data::GameState::PLAYBACK;}
+	);
+	
 	Button quitButton(
 			quitRect,
 			quitText,
@@ -689,6 +836,7 @@ void Game::generateMainMenu() {
 	mainMenuScreen.addButton(startButton);
 	mainMenuScreen.addButton(usernameButton);
 	mainMenuScreen.addButton(leaderboardButton);
+	mainMenuScreen.addButton(playbackButton);
 	mainMenuScreen.addButton(quitButton);
 }
 
@@ -787,11 +935,14 @@ void Game::generateLeaderboardScreen() {
 	for (auto it = highscores.begin(); it != highscores.end() && top5.size() < 5; ++it) {
 		top5.push_back(*it);
 	}
-	
-	std::string temp = top5[0].second + (std::string(" ") * (20 - (int)top5[0].second.size())) + std::to_string(top5[0].first); // this is just to get the length of the string
+	std::string temp;
+	if (!top5.empty()) {
+		temp = top5[0].second + (std::string(" ") * (20 - (int) top5[0].second.size())) +
+		                   std::to_string(top5[0].first); // this is just to get the length of the string
+	}
 	SDL_Rect scoreRect = {twelfth_x, (int)(twelfth_y * 3), LETTER_RATIO(35, (int)temp.length()), 35};
 	for (auto& score : top5) {
-		temp = score.second + (std::string(" ") * (20 - (int)score.second.size())) + std::to_string(score.first);
+		temp = score.second + (std::string(" ") * (25 - (int)score.second.size())) + std::to_string(score.first);
 		Text scoreText(temp, "Assets/Fonts/VCR_OSD_MONO.ttf", 30, Config::TEXT_COLOR);
 		scoreText.setRect(scoreRect);
 		leaderboardScreen.addText(scoreText);
@@ -813,6 +964,73 @@ void Game::generateLeaderboardScreen() {
 	                  }
 	);
 	leaderboardScreen.addButton(backButton);
+}
+
+/**
+ * @brief Generates the screen seen at the end of playback
+ * @note Unlike the other generate functions, this function does clear the playback end screen
+ */
+void Game::generatePlaybackEndScreen() {
+	playbackEndScreen.clearButtons();
+	playbackEndScreen.clearTexts();
+	
+	playbackEndScreen.setBackground("Assets/Game.png");
+	
+	SDL_Rect pbOverRect = {(WindowData::SCREEN_WIDTH - LETTER_RATIO(WindowData::SCREEN_WIDTH / 20, 16)) / 2, WindowData::SCREEN_HEIGHT / 2, LETTER_RATIO(WindowData::SCREEN_WIDTH / 16, 16), WindowData::SCREEN_WIDTH / 16};
+	Text pbOverText("Playback is over", "Assets/Fonts/VCR_OSD_MONO.ttf", 100, (SDL_Color) {255, 0, 0, 255});
+	pbOverText.setRect(pbOverRect);
+	playbackEndScreen.addText(pbOverText);
+	
+	SDL_Rect restartRect = {WindowData::SCREEN_WIDTH / 2 - 160, WindowData::SCREEN_HEIGHT / 2 + 100, LETTER_RATIO(30, 16), 30};
+	Text restartText("Restart playback" , "Assets/Fonts/VCR_OSD_MONO.ttf", 30, (SDL_Color) {0x88, 0x88, 0x88, 255});
+	restartText.setRect(restartRect);
+	Button restartButton(restartRect + (SDL_Rect){-20, -20, 40, 40},
+	                     restartText,
+	                     "Assets/Empty.png",
+	                     "Assets/Empty.png",
+	                     "Assets/Empty.png",
+	                     [this](){
+							reader.open(absolutePath("recording.bin"));
+	                     	Data::gameState = Data::GameState::PLAYBACK;
+	                     }
+	);
+	
+	SDL_Rect mainMenuRect = {WindowData::SCREEN_WIDTH / 2 - 90, WindowData::SCREEN_HEIGHT / 2 + 150, LETTER_RATIO(30, 9), 30};
+	Text mainMenuText("Main Menu", "Assets/Fonts/VCR_OSD_MONO.ttf", 30, (SDL_Color) {0x88, 0x88, 0x88, 255});
+	mainMenuText.setRect(mainMenuRect);
+	Button mainMenuButton(mainMenuRect + (SDL_Rect){-20, -20, 40, 40},
+	                     mainMenuText,
+	                     "Assets/Empty.png",
+	                     "Assets/Empty.png",
+	                     "Assets/Empty.png",
+	                     [this](){
+							reader.open(absolutePath("recording.bin"));
+	                     	Data::gameState = Data::GameState::MAIN_MENU;
+	                     }
+	);
+	
+	playbackEndScreen.addButton(restartButton);
+	playbackEndScreen.addButton(mainMenuButton);
+}
+
+[[maybe_unused]]
+const Player &Game::getPlayer() const {
+	return player;
+}
+
+[[maybe_unused]]
+std::vector<Trash> Game::getTrash() const {
+	return trash;
+}
+
+[[maybe_unused]]
+std::vector<Enemy> Game::getEnemies() const {
+	return enemies;
+}
+
+[[maybe_unused]]
+std::vector<Friendly> Game::getFriendlies() const {
+	return friendlies;
 }
 
 // This comment is just a rant, it's not important nor is it relevant to the code

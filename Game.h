@@ -26,6 +26,10 @@
 #include "Entities/Enemy.h"
 #include "Entities/Friendly.h"
 #include "UI/Line.h"
+#include "Tools/BinaryFile.h"
+
+#include "Recording/Recorder.h"
+#include "Recording/Reader.h"
 
 class Game {
 	Window window = Window("Morski Smetar", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WindowData::SCREEN_WIDTH, WindowData::SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
@@ -44,7 +48,7 @@ class Game {
 	std::vector<GameObject> warnings;
 	std::vector<Line> lines;
 	std::vector<Text> texts;
-//	Text score;
+	
 	GameObject land;
 	GameObject * disembark_indicator = nullptr;
 	
@@ -52,6 +56,11 @@ class Game {
 	Screen mainMenuScreen;
 	Screen usernameScreen;
 	Screen leaderboardScreen;
+	Screen playbackEndScreen;
+	
+	Recorder recorder;
+	Reader reader;
+	std::vector<GameObject> playback_objs;
 	
 	int backspaceCooldown = 0;
 	bool open = true;
@@ -60,6 +69,7 @@ class Game {
 	void generateGameOverScreen();
 	void generateUsernameScreen();
 	void generateLeaderboardScreen();
+	void generatePlaybackEndScreen();
 public:
 	Game() = default;
 	[[nodiscard]] bool isOpen() const;
@@ -70,11 +80,23 @@ public:
 	void GameOverUpdate();
 	void UsernameUpdate();
 	void LeaderboardUpdate();
+	void PlaybackUpdate();
+	void PlaybackEndUpdate();
 	void CheckWindowEvents();
 	void Render(); // Having a separate fuction to render makes the code marginally cleaner, but may cause inefficiencies as some containers might be parsed multiple times (enemies, friendlies, waves & trash)
 	void CompleteStage();
 	void Restart();
 	void writeHighscores();
+	
+	
+	[[nodiscard]] [[maybe_unused]]
+	const Player &getPlayer() const; // Probably over 2 months in and Game gets its first getter
+	[[nodiscard]] [[maybe_unused]]
+	std::vector<Trash> getTrash() const;
+	[[nodiscard]] [[maybe_unused]]
+	std::vector<Enemy> getEnemies() const;
+	[[nodiscard]] [[maybe_unused]]
+	std::vector<Friendly> getFriendlies() const;
 };
 
 

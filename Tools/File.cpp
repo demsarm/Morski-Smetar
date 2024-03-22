@@ -14,7 +14,8 @@ File::File(const std::string &path) {
 	}
 }
 
-File::File(const File &other) {
+
+[[maybe_unused]] File::File(const File &other) {
 	this->path = other.path;
 	fin.close();
 	fout.close();
@@ -33,7 +34,7 @@ File::~File() {
  * @param write_mode the mode to open the file for writing
  * @param read_mode the mode to open the file for reading
  */
-void File::open(std::ios_base::openmode write_mode, std::ios_base::openmode read_mode) {
+[[maybe_unused]] void File::open(std::ios_base::openmode write_mode, std::ios_base::openmode read_mode) {
 	fin.close();
 	fout.close();
 
@@ -80,7 +81,7 @@ void File::write(const std::string &data, bool newline) {
  * @param data the string to be written
  * @param newline whether to add a newline character at the end of the string
  */
-lines File::readLines() {
+[[maybe_unused]] lines File::readLines() {
 	lines lines;
 	std::string line;
 	while (!(line = readLine()).empty()) {

@@ -41,7 +41,7 @@ Zdaj, ko ste igrico >>dokončali<<, boste še nekaj zadevic dodali
 možnost izbiranja (menu) v glavnem oknu:
 Menu na začetku igrice nam omogoča, da vpišemo svoje ime in izberemo eno izmed ponujenih opcij.
 Ker je možno, da se igranja igrice lotijo različni (ekologi) / vegovci, moramo njihovo >>udejstvovanje<< tudi nekako ovrednotiti – vsaka posamezna stopnja prinese določeno število točk; čas igranja lahko t
-udi nekaj velja.  Na koncu se izpiše SAMO pet najboljših rezultatov in njihovih nosilcev (uporaba datotek - zapišeta se dva podatka za vsako igro – ime in točke (ali čas ... ali kej tretjega).
+udi nekaj velja.  Na koncu se izpiše SAMO pet najboljših rezultatov in njihovih nosilcev (uporaba datotek – zapišeta se dva podatka za vsako igro – ime in točke (ali čas ... ali kaj tretjega).
 Zadnji igralec mora imeti možnost pregleda svojih premikov po polju oz. replay
 In če nas nekdo zmoti v uničevanju smeti, ko bi morali npr. vaditi programiranje,
 moramo izbrati prisilni izhod (tipka esc) in shranjevanje igrice.
