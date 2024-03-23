@@ -57,12 +57,14 @@ class Game {
 	Screen usernameScreen;
 	Screen leaderboardScreen;
 	Screen playbackEndScreen;
+	Screen pauseScreen;
 	
 	Recorder recorder;
 	Reader reader;
 	std::vector<GameObject> playback_objs;
 	
 	int backspaceCooldown = 0;
+	int escapeCooldown = 0;
 	bool open = true;
 	
 	void generateMainMenu();
@@ -70,12 +72,14 @@ class Game {
 	void generateUsernameScreen();
 	void generateLeaderboardScreen();
 	void generatePlaybackEndScreen();
+	void generatePauseScreen();
 public:
 	Game() = default;
 	[[nodiscard]] bool isOpen() const;
 	void Setup();
 	void Update();
 	void PlayingUpdate();
+	void PausedUpdate();
 	void MainMenuUpdate();
 	void GameOverUpdate();
 	void UsernameUpdate();

@@ -11,7 +11,8 @@ namespace Data {
 		USERNAME, // Username input screen
 		LEADERBOARD,
 		PLAYBACK, // Viewing replay
-		PLAYBACK_END
+		PLAYBACK_END,
+		PAUSED
 	};
 
 	extern int score;

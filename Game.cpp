@@ -104,6 +104,7 @@ void Game::Setup() {
 	
 	// These have to be made post highscore loading because the highscores are used in the leaderboard screen (and I don't want them scattered willy-nilly)
 	generateMainMenu();
+	generatePauseScreen();
 	generateUsernameScreen();
 	generateLeaderboardScreen();
 }
@@ -286,6 +287,101 @@ void Game::Render(){
 				window.Draw(*disembark_indicator, 0.0, player.isFacingRight() ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL);
 			}
 			break;
+		case Data::GameState::PAUSED:
+			// Clear the window
+			window.Clear((SDL_Color) {50, 210, 255, 255});
+			
+			// Draw the waves
+			for (auto &wave: waves) {
+				window.Draw(wave);
+			}
+			
+			// Let there be land (again)
+			window.Draw(land);
+			
+			// Draw the trash
+			for (auto &t: trash) {
+				window.Draw(t);
+			}
+			
+			// Draw the enemies
+			for (auto &e: enemies) {
+				bool draw = distance(player, e) < Config::PLAYER_SIGHT_RANGE;
+				for (auto &f: friendlies) {
+					if (distance(f, e) < Config::ALLY_SIGHT_RANGE &&
+					    f.getType() == Friendly::Type::LAND) { // Make "sight sharing" exclusive to land friendlies
+						draw = true;
+					}
+					if (draw) {
+						// Would be put in the if statement above, but that would
+						//  1. make the code less readable and
+						//  2. result in the code going through the whole loop (in the worst case) even if the enemy is in sight of the player
+						break;
+					}
+				}
+				if (draw) {
+					window.Draw(e);
+				}
+			}
+			
+			// Draw the friendlies
+			for (auto &f: friendlies) {
+				window.Draw(f, 0.0,
+				            f.getDirection() == Friendly::Direction::NEGATIVE ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL);
+				if (f.getType() == Friendly::Type::LAND) {
+					window.DrawCircle(f.getRect().x + f.getRect().w / 2,
+					                  f.getRect().y + f.getRect().h / 2,
+					                  Data::friendly_sonar, 5, Friendly::getSonarColor(), 32);
+					window.DrawCircle(f.getRect().x + f.getRect().w / 2,
+					                  f.getRect().y + f.getRect().h / 2,
+					                  Config::ALLY_SIGHT_RANGE, 5, Friendly::getSonarColor(), 32);
+				}
+			}
+			
+			++Data::friendly_sonar;
+			if (Data::friendly_sonar > Config::ALLY_SIGHT_RANGE) {
+				Data::friendly_sonar = 0;
+			}
+			
+			// Draw the player and his 'sonar'
+			window.DrawCircle(player.getRect().x + player.getRect().w / 2, player.getRect().y + player.getRect().h / 2,
+			                  Config::PLAYER_SIGHT_RANGE, 5, player.getSonarColor(), 32);
+			window.DrawCircle(player.getRect().x + player.getRect().w / 2, player.getRect().y + player.getRect().h / 2,
+			                  Data::sonar, 5, player.getSonarColor(), 32);
+			window.Draw(player, 0.0, player.isFacingLeft() ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL);
+			
+			// Move the player's "inner sonar"
+			++Data::sonar;
+			if (Data::sonar > Config::PLAYER_SIGHT_RANGE) {
+				Data::sonar = 0;
+			}
+			
+			// Draw the boat if the player isn't on it
+			if (player.getBoatPosition() != (SDL_Rect) {0, 0, 0, 0}) {
+				GameObject boat;
+				boat.setPath("Assets/Boat.png");
+				boat.setRect(player.getBoatPosition());
+				window.Draw(boat);
+			}
+			
+			// Draw the score
+			for (auto &t: texts) {
+				window.Draw(t);
+			}
+			
+			for (auto &l: lines) {
+				window.DrawLine(l);
+			}
+			
+			for (auto &w: warnings) {
+				window.Draw(w);
+			}
+			if (disembark_indicator != nullptr) {
+				window.Draw(*disembark_indicator, 0.0, player.isFacingRight() ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL);
+			}
+			
+			window.Draw(pauseScreen);
+			break;
 		case Data::GameState::PLAYBACK: // TODO Test this
 			window.Clear((SDL_Color) {50, 210, 255, 255});
 			
@@ -326,6 +422,8 @@ void Game::Restart() {
 	recorder.clearFile();
 	Window::setWindowSize(800, 600);
 	window.changeWindowSize(WindowData::SCREEN_WIDTH, WindowData::SCREEN_HEIGHT);
+	
+	generatePauseScreen();
 	
 	Data::score = 0;
 	Data::difficulty = 1;
@@ -399,6 +497,9 @@ void Game::Update() {
 			break;
 		case Data::GameState::PLAYBACK_END:
 			PlaybackEndUpdate();
+			break;
+		case Data::GameState::PAUSED:
+			PausedUpdate();
 			break;
 	}
 }
@@ -598,10 +699,34 @@ void Game::PlayingUpdate() {
 #endif
 
 	recorder.Update(player, enemies, friendlies, trash);
+
+	if (Data::gameState == Data::GameState::GAME_OVER) {
+		recorder.Write(Recorder::Type::END_OF_FILE, 0, 0);
+	}
+
+	if (Input::getKey("Escape") && !escapeCooldown) {
+		Data::gameState = Data::GameState::PAUSED;
+		escapeCooldown = 100;
+	} else {
+		escapeCooldown = escapeCooldown > 0 ? escapeCooldown - 1 : 0;
+	}
 	
 	if (enemies.empty() && trash.empty()) { // && friendlies.empty() if you want to be evil and make the player commit several federal crimes and be arrested on 91 criminal charges in order to complete the stage
 		CompleteStage();
 		recorder.Write(Recorder::Type::COMPLETE_STAGE, WindowData::SCREEN_WIDTH, WindowData::SCREEN_HEIGHT);
+	}
+}
+
+/**
+ * @brief Updates the pause screen
+ */
+void Game::PausedUpdate() {
+	pauseScreen.Update();
+	if (Input::getKey("Escape") && !escapeCooldown) {
+		Data::gameState = Data::GameState::PLAYING;
+		escapeCooldown = 100;
+	} else {
+		escapeCooldown = escapeCooldown > 0 ? escapeCooldown - 1 : 0;
 	}
 }
 
@@ -737,6 +862,9 @@ void Game::PlaybackUpdate() {
 	}
 }
 
+/**
+ * @brief Updates the playback end screen
+ */
 void Game::PlaybackEndUpdate() {
 	playbackEndScreen.Update();
 }
@@ -837,7 +965,68 @@ void Game::generateMainMenu() {
 	mainMenuScreen.addButton(usernameButton);
 	mainMenuScreen.addButton(leaderboardButton);
 	mainMenuScreen.addButton(playbackButton);
+	mainMenuScreen.addButton(loadSaveButton);
 	mainMenuScreen.addButton(quitButton);
+}
+
+/**
+ * @brief Generates the pause screen
+ */
+void Game::generatePauseScreen() {
+	pauseScreen.setBackground("Assets/Gray50.png");
+	
+	pauseScreen.clearTexts();
+	pauseScreen.clearButtons();
+	
+	SDL_Rect pauseRect = { 100, 100, LETTER_RATIO(100, 6), 100};
+	SDL_Rect continueRect = {100, 250, LETTER_RATIO(30, 8), 30};
+	SDL_Rect restartRect = {100, 300, LETTER_RATIO(30, 7), 30};
+	SDL_Rect menuRect = {100, 350, LETTER_RATIO(30, 10), 30};
+	
+	Text pauseText("Paused", "Assets/Fonts/VCR_OSD_MONO.ttf", 100, Config::TEXT_COLOR);
+	Text continueText("Continue", "Assets/Fonts/VCR_OSD_MONO.ttf", 30, Config::BUTTON_COLOR);
+	Text restartText("Restart", "Assets/Fonts/VCR_OSD_MONO.ttf", 30, Config::BUTTON_COLOR);
+	Text menuText("Main Menu", "Assets/Fonts/VCR_OSD_MONO.ttf", 30, Config::BUTTON_COLOR);
+	
+	pauseText.setRect(pauseRect);
+	continueText.setRect(continueRect);
+	restartText.setRect(restartRect);
+	menuText.setRect(menuRect);
+	
+	Button continueButton(
+			continueRect,
+			continueText,
+			"Assets/Empty.png",
+			"Assets/Empty.png",
+			"Assets/Empty.png",
+			[this](){Data::gameState = Data::GameState::PLAYING;}
+	);
+	
+	Button restartButton(
+			restartRect,
+			restartText,
+			"Assets/Empty.png",
+			"Assets/Empty.png",
+			"Assets/Empty.png",
+			[this](){this->Restart();}
+	);
+	
+	Button menuButton(
+			menuRect,
+			menuText,
+			"Assets/Empty.png",
+			"Assets/Empty.png",
+			"Assets/Empty.png",
+			[this](){
+				Data::gameState = Data::GameState::MAIN_MENU;
+				this->generateLeaderboardScreen();
+			}
+	);
+	
+	pauseScreen.addText(pauseText);
+	pauseScreen.addButton(continueButton);
+	pauseScreen.addButton(restartButton);
+	pauseScreen.addButton(menuButton);
 }
 
 /**
@@ -1032,6 +1221,8 @@ std::vector<Enemy> Game::getEnemies() const {
 std::vector<Friendly> Game::getFriendlies() const {
 	return friendlies;
 }
+
+
 
 // This comment is just a rant, it's not important nor is it relevant to the code
 // In the Game::PlayingUpdate() method, I mentioned that we need more games that play around with actual windows
