@@ -700,10 +700,6 @@ void Game::PlayingUpdate() {
 
 	recorder.Update(player, enemies, friendlies, trash);
 
-	if (Data::gameState == Data::GameState::GAME_OVER) {
-		recorder.Write(Recorder::Type::END_OF_FILE, 0, 0);
-	}
-
 	if (Input::getKey("Escape") && !escapeCooldown) {
 		Data::gameState = Data::GameState::PAUSED;
 		escapeCooldown = 100;
@@ -965,7 +961,6 @@ void Game::generateMainMenu() {
 	mainMenuScreen.addButton(usernameButton);
 	mainMenuScreen.addButton(leaderboardButton);
 	mainMenuScreen.addButton(playbackButton);
-	mainMenuScreen.addButton(loadSaveButton);
 	mainMenuScreen.addButton(quitButton);
 }
 
