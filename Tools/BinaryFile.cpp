@@ -55,6 +55,8 @@ bool BinaryFile::eof() const {
 	return fin.eof();
 }
 
-bool BinaryFile::good() const {
-	return fin.good();
+
+bool BinaryFile::isFileEmpty(const std::string& filename) {
+	std::ifstream file(path, std::ios::binary | std::ios::ate);
+	return file.tellg() == 0;
 }
