@@ -28,8 +28,9 @@
 #include "UI/Line.h"
 #include "Tools/BinaryFile.h"
 
-#include "Recording/Recorder.h"
-#include "Recording/Reader.h"
+#include "State Capturing/Recorder.h"
+#include "State Capturing/Reader.h"
+#include "State Capturing/SaveManager.h"
 
 class Game {
 	Window window = Window("Morski Smetar", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WindowData::SCREEN_WIDTH, WindowData::SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
@@ -63,6 +64,8 @@ class Game {
 	Reader reader;
 	std::vector<GameObject> playback_objs;
 	
+	SaveManager saveManager;
+	
 	int backspaceCooldown = 0;
 	int escapeCooldown = 0;
 	bool open = true;
@@ -78,6 +81,12 @@ public:
 	[[nodiscard]] bool isOpen() const;
 	void Setup();
 	void Update();
+	void Render(); // Having a separate fuction to render makes the code marginally cleaner, but may cause inefficiencies as some containers might be parsed multiple times (enemies, friendlies, waves & trash)
+	void CompleteStage();
+	void Restart();
+	void writeHighscores();
+	void loadSave();
+	
 	void PlayingUpdate();
 	void PausedUpdate();
 	void MainMenuUpdate();
@@ -87,14 +96,10 @@ public:
 	void PlaybackUpdate();
 	void PlaybackEndUpdate();
 	void CheckWindowEvents();
-	void Render(); // Having a separate fuction to render makes the code marginally cleaner, but may cause inefficiencies as some containers might be parsed multiple times (enemies, friendlies, waves & trash)
-	void CompleteStage();
-	void Restart();
-	void writeHighscores();
 	
 	
 	[[nodiscard]] [[maybe_unused]]
-	const Player &getPlayer() const; // Probably over 2 months in and Game gets its first getter
+	const Player &getPlayer() const; // Probably over 2 months in and Game gets its first getter (that's never going to get used)
 	[[nodiscard]] [[maybe_unused]]
 	std::vector<Trash> getTrash() const;
 	[[nodiscard]] [[maybe_unused]]

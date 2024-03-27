@@ -64,7 +64,7 @@ Reader::Record Reader::Next() {
 	return r;
 }
 
-bool Reader::eof() const {
+bool Reader::eof() {
 	return file.eof();
 }
 

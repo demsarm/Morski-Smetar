@@ -40,6 +40,8 @@ void Game::Setup() {
 	reader.open(absolutePath("recording.bin"));
 	playback_objs.clear();
 	
+	saveManager.open(absolutePath("save.mssf"));
+	
 	// Player setup
 	player.setPath("Assets/Boat.png");
 	player.setRect({Random::randint((int) (WindowData::SCREEN_WIDTH * 21 / 30), (int) (WindowData::SCREEN_WIDTH * 0.9)),
@@ -609,6 +611,7 @@ void Game::PlayingUpdate() {
 				              (int64_t) i); // Yes that is how I cast to long I may or may not be chronically deranged
 				Data::score += 2;
 			} else {
+				saveManager.deleteSave();
 				Data::gameState = Data::GameState::GAME_OVER;
 				// Create the game over screen - it's not done in Setup() because WindowData::SCREEN_WIDTH and WindowData::SCREEN_HEIGHT are changed during gameplay
 				generateGameOverScreen();
@@ -691,12 +694,6 @@ void Game::PlayingUpdate() {
 	           30, (SDL_Color) {255, 255, 255, 255});
 	score.setRect({10, 10, 200, 50});
 	texts.push_back(score); // Clang-Tidy: Use emplace_back instead of push_back (iont feel like it)
-
-#ifdef DEBUG
-	if (player.getRect().x < 0 || player.getRect().y < 0) {
-		std::cerr << "Player in invalid position: " << player.getRect().x << ", " << player.getRect().y << std::endl;
-	}
-#endif
 
 	recorder.Update(player, enemies, friendlies, trash);
 
@@ -892,13 +889,15 @@ void Game::generateMainMenu() {
 	SDL_Rect usernameRect = {twelfth_x, (int)(twelfth_y * 4.5), LETTER_RATIO(twelfth_y, 12), twelfth_y};
 	SDL_Rect leaderboardRect = {twelfth_x, (int)(twelfth_y * 6), LETTER_RATIO(twelfth_y, 11), twelfth_y};
 	SDL_Rect playbackRect = {twelfth_x, (int)(twelfth_y * 7.5), LETTER_RATIO(twelfth_y, 8), twelfth_y};
-	SDL_Rect quitRect = {twelfth_x, (int)(twelfth_y * 9), LETTER_RATIO(twelfth_y, 4), twelfth_y};
+	SDL_Rect loadRect = {twelfth_x, (int)(twelfth_y * 9), LETTER_RATIO(twelfth_y, 9), twelfth_y};
+	SDL_Rect quitRect = {twelfth_x, (int)(twelfth_y * 10.5), LETTER_RATIO(twelfth_y, 4), twelfth_y};
 	
 	Text gameText("Morski Smetar", "Assets/Fonts/VCR_OSD_MONO.ttf", 100, Config::TEXT_COLOR);
 	Text startText("Start", "Assets/Fonts/VCR_OSD_MONO.ttf", 50, Config::BUTTON_COLOR);
 	Text usernameText("Set username", "Assets/Fonts/VCR_OSD_MONO.ttf", 50, Config::BUTTON_COLOR);
 	Text leaderboardText("Leaderboard", "Assets/Fonts/VCR_OSD_MONO.ttf", 50, Config::BUTTON_COLOR);
 	Text playbackText("Playback", "Assets/Fonts/VCR_OSD_MONO.ttf", 50, Config::BUTTON_COLOR);
+	Text loadText("Load save", "Assets/Fonts/VCR_OSD_MONO.ttf", 50, Config::BUTTON_COLOR);
 	Text quitText("Quit", "Assets/Fonts/VCR_OSD_MONO.ttf", 50, Config::BUTTON_COLOR);
 	
 	gameText.setRect({twelfth_x, twelfth_y, LETTER_RATIO((int)(twelfth_y * 1.5), 13), (int)(twelfth_y * 1.5)});
@@ -906,6 +905,7 @@ void Game::generateMainMenu() {
 	usernameText.setRect(usernameRect + (SDL_Rect){20, 5, -40, -10});
 	leaderboardText.setRect(leaderboardRect + (SDL_Rect){20, 5, -40, -10});
 	playbackText.setRect(playbackRect + (SDL_Rect){20, 5, -40, -10});
+	loadText.setRect(loadRect + (SDL_Rect){20, 5, -40, -10});
 	quitText.setRect(quitRect + (SDL_Rect){20, 5, -40, -10});
 
 	Button startButton(
@@ -947,13 +947,27 @@ void Game::generateMainMenu() {
 			[](){Data::gameState = Data::GameState::PLAYBACK;}
 	);
 	
+	Button loadButton(
+			loadRect,
+			loadText,
+			"Assets/Empty.png",
+			"Assets/Empty.png",
+			"Assets/Empty.png",
+			[this](){
+				if (this->saveManager.SaveExists()) {
+					loadSave();
+					Data::gameState = Data::GameState::PLAYING;
+				}
+			}
+	);
+	
 	Button quitButton(
 			quitRect,
 			quitText,
 			"Assets/Empty.png",
 			"Assets/Empty.png",
 			"Assets/Empty.png",
-			[this](){open = false;}
+			[this](){ open = false; }
 	);
 	
 	mainMenuScreen.addText(gameText);
@@ -961,6 +975,7 @@ void Game::generateMainMenu() {
 	mainMenuScreen.addButton(usernameButton);
 	mainMenuScreen.addButton(leaderboardButton);
 	mainMenuScreen.addButton(playbackButton);
+	mainMenuScreen.addButton(loadButton);
 	mainMenuScreen.addButton(quitButton);
 }
 
@@ -994,7 +1009,7 @@ void Game::generatePauseScreen() {
 			"Assets/Empty.png",
 			"Assets/Empty.png",
 			"Assets/Empty.png",
-			[this](){Data::gameState = Data::GameState::PLAYING;}
+			[](){ Data::gameState = Data::GameState::PLAYING; }
 	);
 	
 	Button restartButton(
@@ -1003,7 +1018,7 @@ void Game::generatePauseScreen() {
 			"Assets/Empty.png",
 			"Assets/Empty.png",
 			"Assets/Empty.png",
-			[this](){this->Restart();}
+			[this](){ this->Restart(); }
 	);
 	
 	Button menuButton(
@@ -1013,6 +1028,9 @@ void Game::generatePauseScreen() {
 			"Assets/Empty.png",
 			"Assets/Empty.png",
 			[this](){
+				// int difficulty, int screenW, int screenH, int score, const Player &player, const std::vector<Trash> &trash, const std::vector<Enemy> &enemies, const std::vector<Friendly> &friendlies
+				this->saveManager.WriteSave(Data::difficulty, WindowData::SCREEN_WIDTH, WindowData::SCREEN_HEIGHT, Data::score, player, trash, enemies, friendlies);
+				saveManager.open(absolutePath("save.mssf"));
 				Data::gameState = Data::GameState::MAIN_MENU;
 				this->generateLeaderboardScreen();
 			}
@@ -1215,6 +1233,36 @@ std::vector<Enemy> Game::getEnemies() const {
 [[maybe_unused]]
 std::vector<Friendly> Game::getFriendlies() const {
 	return friendlies;
+}
+
+void Game::loadSave() {
+	enemies.clear();
+	friendlies.clear();
+	trash.clear();
+	
+	
+	std::tuple<std::tuple<int, int, int>, int, Player, std::vector<Trash>, std::vector<Enemy>, std::vector<Friendly>> save = saveManager.ReadSave();
+	
+	std::tuple<int, int, int> gameState = std::get<0>(save);
+	int score = std::get<1>(save);
+	player = std::get<2>(save);
+	trash = std::get<3>(save);
+	enemies = std::get<4>(save);
+	friendlies = std::get<5>(save);
+	
+	Data::score = score;
+	int screenW = std::get<0>(gameState);
+	int screenH = std::get<1>(gameState);
+	int difficulty = std::get<2>(gameState);
+	
+	Window::setWindowSize(screenW, screenH);
+	window.changeWindowSize(WindowData::SCREEN_WIDTH, WindowData::SCREEN_HEIGHT);
+	window.centerWindow();
+	
+	land.setRect({0, 0, WindowData::SCREEN_WIDTH / 3, WindowData::SCREEN_HEIGHT});
+	land.setPath(absolutePath("Assets/Sand.png"));
+	
+	Data::difficulty = difficulty;
 }
 
 

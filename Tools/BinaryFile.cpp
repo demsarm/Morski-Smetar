@@ -54,3 +54,7 @@ std::pair<bool, bool> BinaryFile::is_open() {
 bool BinaryFile::eof() const {
 	return fin.eof();
 }
+
+bool BinaryFile::good() const {
+	return fin.good();
+}
