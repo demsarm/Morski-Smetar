@@ -110,7 +110,7 @@ std::tuple<std::tuple<int, int, int>, int, Player, std::vector<Trash>, std::vect
 			case Type::FRIENDLY: {
 				Friendly buff(record.x, record.y);
 				buff.setAxis((Friendly::Axis)record.other);
-				buff.setPath(record.x < WindowData::SCREEN_WIDTH / 3 ? absolutePath("Assets/Tractor.png") : absolutePath("Assets/Boat.png"));
+				buff.setPath(record.x < WindowData::SCREEN_WIDTH / 3 ? absolutePath("Assets/Tractor.png") : absolutePath("Assets/Fishing-Boat.png"));
 				friendlies.push_back(buff);
 				break;
 			}
