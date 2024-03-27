@@ -35,6 +35,7 @@ public:
 	
 	std::pair<bool, bool> is_open();
 	bool eof() const;
+	bool good() const;
 };
 
 

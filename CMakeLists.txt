@@ -58,12 +58,14 @@ add_executable(Morski_Smetar main.cpp
         Tools/MD5.h
         Tools/BinaryFile.cpp
         Tools/BinaryFile.h
-        Recording/Recorder.cpp
-        Recording/Recorder.h
+        "State Capturing/Recorder.cpp"
+        "State Capturing/Recorder.h"
         Game.cpp
         Game.h
-        Recording/Reader.cpp
-        Recording/Reader.h
+        "State Capturing/Reader.cpp"
+        "State Capturing/Reader.h"
+        "State Capturing/SaveManager.cpp"
+        "State Capturing/SaveManager.h"
 )
 
 target_link_libraries(Morski_Smetar SDL2)

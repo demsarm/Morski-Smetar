@@ -1,9 +1,11 @@
+#include <iostream>
 #include "Player.h"
 
 #include "../Config/Config.h"
 #include "../Tools/Collision.h"
 #include "../Tools/Overloads.h"
 #include "../UI/Input.h"
+#include "../Tools/filesystem.h"
 
 /**
  * Default constructor for the Player class.
@@ -14,7 +16,9 @@
  * The player moves up when the 'W' key is pressed, down when the 'S' key is pressed,
  * left when the 'A' key is pressed, and right when the 'D' key is pressed.
  */
-Player::Player() : facing_right(true), sonar_color(){}
+Player::Player() : facing_right(true), sonar_color(){
+	design.path = absolutePath("Assets/Boat.png");
+}
 
 /**
  * Constructor for the Player class.

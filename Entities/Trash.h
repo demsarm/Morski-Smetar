@@ -30,6 +30,7 @@ public:
 	[[maybe_unused]] Trash();
 	[[maybe_unused]] Trash(int x, int y);
 	[[maybe_unused]] Trash(const Trash &other);
+	void setType(Trash::Type newType);
 	[[maybe_unused]] [[nodiscard]] Type getType() const;
 	
 	[[maybe_unused]]

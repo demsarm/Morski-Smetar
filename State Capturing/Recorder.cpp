@@ -36,20 +36,21 @@ unsigned Recorder::Mask(Type t, int x, int y) {
 
 #ifdef DEBUG
 	if ((x > WindowData::SCREEN_WIDTH || y > WindowData::SCREEN_HEIGHT) && t != Type::COMPLETE_STAGE) {
-		std::cerr << "Recorded a bad position" << std::endl;
-		std::cerr << "X: " << x << " Y: " << y << std::endl;
+//		std::cerr << "Recorded a bad position" << std::endl;
+//		std::cerr << "X: " << x << " Y: " << y << std::endl;
 	}
 	
 	if (log(x)/log(2) > 14 || log(y)/log(2) > 14) {
-		std::cerr << "Recorded a position with too many bits" << std::endl;
-		std::cerr << "X: " << x << " Y: " << y << std::endl;
+//		std::cerr << "Recorded a position with too many bits" << std::endl;
+//		std::cerr << "X: " << x << " Y: " << y << std::endl;
 	}
 	
 	if (log(x)/log(2) < 0 || log(y)/log(2) < 0) {
-		std::cerr << "Recorded a negative position" << std::endl;
-		std::cerr << "T: " << t << " X: " << x << " Y: " << y << std::endl;
+//		std::cerr << "Recorded a negative position" << std::endl;
+//		std::cerr << "T: " << t << " X: " << x << " Y: " << y << std::endl;
 	}
 #endif
+	
 	unsigned mask4 = (1 << 4) - 1;
 	unsigned mask14 = (1 << 14) - 1;
 	
@@ -145,13 +146,13 @@ void Recorder::Write(Recorder::Type t, int x, int y) {
 	}
 	
 	if (x > WindowData::SCREEN_WIDTH || y > WindowData::SCREEN_HEIGHT) {
-		std::cerr << "Got instruction with bad position" << std::endl;
-		std::cerr << "Type: " << std::bitset<4>(t) << " X: " << std::bitset<14>(x) << " Y: " << std::bitset<14>(y) << " > " << std::bitset<32>(r) << std::endl;
+//		std::cerr << "Got instruction with bad position" << std::endl;
+//		std::cerr << "Type: " << std::bitset<4>(t) << " X: " << std::bitset<14>(x) << " Y: " << std::bitset<14>(y) << " > " << std::bitset<32>(r) << std::endl;
 	}
 	
 	if (Reader::Unmask(r).x > WindowData::SCREEN_WIDTH || Reader::Unmask(r).y > WindowData::SCREEN_HEIGHT) {
-		std::cerr << "Wrote a record with bad position" << std::endl;
-		std::cerr << "Type: " << std::bitset<4>(t) << " X: " << std::bitset<14>(x) << " Y: " << std::bitset<14>(y) << " > " << std::bitset<32>(r) << std::endl;
+//		std::cerr << "Wrote a record with bad position" << std::endl;
+//		std::cerr << "Type: " << std::bitset<4>(t) << " X: " << std::bitset<14>(x) << " Y: " << std::bitset<14>(y) << " > " << std::bitset<32>(r) << std::endl;
 	}
 #endif
 	

@@ -8,6 +8,8 @@
 #include "Tools/filesystem.h"
 #endif
 
+// TODO Note to self: enable checking for fallthrough in Clang-Tidy when you figure out how
+
 using namespace std;
 
 #ifdef _WIN32
@@ -24,7 +26,6 @@ int main() {
 //	hasher.hex_digest(hash);
 //
 //	cout << "Hash of " << data << " is " << hash << endl;
-
 #ifdef DEBUG
 	freopen(absolutePath("debug.txt").c_str(), "w", stdout);
 	freopen(absolutePath("debug.txt").c_str(), "w", stderr);

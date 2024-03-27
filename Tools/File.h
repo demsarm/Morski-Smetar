@@ -22,6 +22,7 @@ public:
 	[[maybe_unused]] void open(std::ios_base::openmode write_mode = std::ios_base::app, std::ios_base::openmode read_mode = std::ios_base::in);
 	
 	 std::string readLine(bool includeNewline = false);
+	 std::string readAll();
 	void write(const std::string& data, bool newline = true);
 	void clearFile();
 	

@@ -52,3 +52,9 @@ void Trash::Update() {
 [[maybe_unused]] Trash::Type Trash::getType() const {
 	return type;
 }
+
+void Trash::setType(Trash::Type newType) {
+	type = newType;
+	
+	design.path = trash_types[(int)type];
+}

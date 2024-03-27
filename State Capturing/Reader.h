@@ -51,7 +51,7 @@ public:
 	void open(const std::string& path);
 	int Scan();
 	Record Next();
-	bool eof() const;
+	bool eof();
 	[[nodiscard]] const std::vector<Record>& getObjects() const;
 	// If they want to change the screen size, they can find the COMPLETE_STAGE record and change it idc
 	//	[[nodiscard]] const Record& getCurrentSize() const;

@@ -1,7 +1,4 @@
-//
-// Created by martind on 19.2.2024.
-//
-
+#include "../Tools/filesystem.h"
 #include "Enemy.h"
 
 #include "../Tools/Random.h"
@@ -25,6 +22,7 @@ Enemy::Enemy() : GameObject() {
 	state = IDLE;
 	axis = (Axis) Random::randint(0, 2);
 	direction = (Direction) Random::randint(0, 2);
+	design.path = absolutePath("Assets/Enemy.png");
 }
 
 /**

@@ -100,3 +100,12 @@ void File::clearFile() {
 	file.open(path); // Opens the file in insert mode which by some leap of logic clears the file don't ask me about the leap in question
 	file.close();
 }
+
+std::string File::readAll() {
+	std::string data;
+	std::string line;
+	while (std::getline(fin, line)) {
+		data += line + '\n';
+	}
+	return data;
+}
