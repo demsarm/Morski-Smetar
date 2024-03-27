@@ -3,6 +3,8 @@
 #include "UI/Button.h"
 #include "Tools/File.h"
 
+#include "Tools/filesystem.h"
+
 // I have no clue where this will be used (in the generate____Screen functions, but I'm not sure where else), so it goes here
 #define LETTER_RATIO(h, len) (h * 2 / 3 * len)
 
@@ -954,7 +956,7 @@ void Game::generateMainMenu() {
 			"Assets/Empty.png",
 			"Assets/Empty.png",
 			[this](){
-				if (this->saveManager.SaveExists()) {
+				if (!saveManager.saveEmpty()) {
 					loadSave();
 					Data::gameState = Data::GameState::PLAYING;
 				}

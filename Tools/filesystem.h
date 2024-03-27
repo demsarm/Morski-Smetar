@@ -20,4 +20,6 @@ std::string absolutePath(const std::string& relativePath);
 */
 std::string getWorkingDir();
 
+bool fileExists(const std::string& filename);
+
 #endif //SDL_GAME_PATH_HPP

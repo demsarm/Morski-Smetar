@@ -25,3 +25,7 @@ std::string absolutePath(const std::string& relativePath){
 std::string getWorkingDir(){
 	return std::filesystem::current_path().string();
 }
+
+bool fileExists(const std::string& filename) {
+	return std::filesystem::exists(filename);
+}
